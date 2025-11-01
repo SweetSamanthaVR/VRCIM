@@ -5,6 +5,21 @@ All notable changes to VRCIM (VRChat Instance Monitor) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2025-11-01
+
+### Changed
+- **Users Page Pagination**: Improved pagination system to use server-side pagination
+  - Limits display to 50 users per page
+  - Fetches only the current page from the database (instead of loading 1000+ users)
+  - Improved performance for large user databases
+  - Search and filter functionality still uses client-side filtering for best UX
+  - Pagination controls automatically hide when not needed
+
+### Technical Details
+- Modified frontend to request paginated data from `/api/users/cached` endpoint
+- Updated pagination logic to calculate total pages from server-provided count
+- Optimized data loading to reduce memory usage and improve page load times
+
 ## [1.2.0] - 2025-11-01
 
 ### Added
@@ -200,6 +215,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This is the initial release of VRCIM. For future updates, changes will be documented following the categories: Added, Changed, Deprecated, Removed, Fixed, and Security.
 
+[1.2.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.0.0...v1.0.1

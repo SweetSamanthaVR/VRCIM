@@ -12,6 +12,7 @@
 // State management
 let allUsers = [];
 let filteredUsers = [];
+let totalUsersCount = 0; // Total count from server for pagination
 let currentFilter = 'all';
 let currentPage = 1;
 const USERS_PER_PAGE = 50;
@@ -77,16 +78,20 @@ function setupEventListeners() {
     document.getElementById('prevPage').addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
-            displayCurrentPage();
+            loadUsers(); // Reload from server with new page
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 
     document.getElementById('nextPage').addEventListener('click', () => {
-        const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+        // Use totalUsersCount for server-side pagination, or filteredUsers.length for client-side filtering
+        const isFiltering = currentFilter !== 'all' || (document.getElementById('searchInput')?.value || '').trim() !== '';
+        const totalCount = isFiltering ? filteredUsers.length : totalUsersCount;
+        const totalPages = Math.ceil(totalCount / USERS_PER_PAGE);
+        
         if (currentPage < totalPages) {
             currentPage++;
-            displayCurrentPage();
+            loadUsers(); // Reload from server with new page
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
@@ -96,7 +101,7 @@ function setupEventListeners() {
 }
 
 /**
- * Load users from API
+ * Load users from API with server-side pagination
  */
 async function loadUsers() {
     const loadingState = document.getElementById('loading-state');
@@ -111,9 +116,11 @@ async function loadUsers() {
     usersGrid.style.display = 'none';
 
     try {
-        // Fetch users with pagination support (limit 1000 for client-side pagination)
-        // TODO: Implement full server-side pagination for very large user lists
-        const response = await fetch('/api/users/cached?limit=1000&offset=0');
+        // Calculate offset based on current page
+        const offset = (currentPage - 1) * USERS_PER_PAGE;
+        
+        // Fetch users with server-side pagination (50 per page)
+        const response = await fetch(`/api/users/cached?limit=${USERS_PER_PAGE}&offset=${offset}`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -122,10 +129,23 @@ async function loadUsers() {
         const data = await response.json();
         allUsers = data.users || [];
         
-        // Use total count from API if available, otherwise use array length
-        const totalCount = data.pagination?.total || allUsers.length;
-        updateStatsSummary(totalCount);
-        applyFilters('', 'all');
+        // Store total count for pagination
+        totalUsersCount = data.pagination?.total || allUsers.length;
+        updateStatsSummary(totalUsersCount);
+        
+        // For server-side pagination, filteredUsers is the same as allUsers
+        filteredUsers = allUsers;
+        
+        // Apply search/filter (will need to reload from server if filtering)
+        const searchTerm = document.getElementById('searchInput')?.value || '';
+        if (searchTerm || currentFilter !== 'all') {
+            // If search/filter is active, fall back to client-side filtering
+            // by loading all users (we'll optimize this in a future update)
+            await loadAllUsersForFiltering();
+        } else {
+            // No filtering, display current page
+            displayCurrentPage();
+        }
     } catch (error) {
         console.error('❌ Error loading users:', error);
         
@@ -135,6 +155,26 @@ async function loadUsers() {
         document.getElementById('error-message').textContent = escapeHtml(error.message);
         
         // Also display global error message
+        displayErrorMessage('Failed to Load Users', error.message);
+    }
+}
+
+/**
+ * Load all users for client-side filtering (fallback for search/filter)
+ */
+async function loadAllUsersForFiltering() {
+    try {
+        const response = await fetch('/api/users/cached?limit=1000&offset=0');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        allUsers = data.users || [];
+        
+        const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+        applyFilters(searchTerm, currentFilter);
+    } catch (error) {
+        console.error('❌ Error loading all users:', error);
         displayErrorMessage('Failed to Load Users', error.message);
     }
 }
@@ -184,9 +224,20 @@ function applyFilters(searchTerm, filter) {
  * Display current page of users
  */
 function displayCurrentPage() {
-    const startIndex = (currentPage - 1) * USERS_PER_PAGE;
-    const endIndex = startIndex + USERS_PER_PAGE;
-    const usersToDisplay = filteredUsers.slice(startIndex, endIndex);
+    // For server-side pagination (no filtering), display all users from current fetch
+    // For client-side filtering, slice the filtered results
+    const isFiltering = currentFilter !== 'all' || (document.getElementById('searchInput')?.value || '').trim() !== '';
+    
+    let usersToDisplay;
+    if (isFiltering) {
+        // Client-side pagination when filtering
+        const startIndex = (currentPage - 1) * USERS_PER_PAGE;
+        const endIndex = startIndex + USERS_PER_PAGE;
+        usersToDisplay = filteredUsers.slice(startIndex, endIndex);
+    } else {
+        // Server-side pagination (all users from allUsers are already the right page)
+        usersToDisplay = allUsers;
+    }
     
     // Enable virtual scrolling if we have many users
     virtualScrollState.isEnabled = filteredUsers.length > 100;
@@ -297,7 +348,11 @@ function renderVirtualItems() {
  * Update pagination controls
  */
 function updatePagination() {
-    const totalPages = Math.ceil(filteredUsers.length / USERS_PER_PAGE);
+    // Use totalUsersCount for server-side pagination, or filteredUsers.length for client-side filtering
+    const isFiltering = currentFilter !== 'all' || (document.getElementById('searchInput')?.value || '').trim() !== '';
+    const totalCount = isFiltering ? filteredUsers.length : totalUsersCount;
+    const totalPages = Math.ceil(totalCount / USERS_PER_PAGE);
+    
     const paginationDiv = document.getElementById('pagination');
     const prevBtn = document.getElementById('prevPage');
     const nextBtn = document.getElementById('nextPage');
