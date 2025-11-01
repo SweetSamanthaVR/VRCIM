@@ -5,6 +5,34 @@ All notable changes to VRCIM (VRChat Instance Monitor) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-11-01
+
+### Fixed
+- **Critical**: Fixed WebSocket connection timeout when using `NODE_ENV=production` without HTTPS
+  - WebSocket protocol now auto-detects from browser URL (HTTP→WS, HTTPS→WSS)
+  - WebSocket host now auto-detects from browser URL (works with localhost, IP addresses, and hostnames)
+  - Removed hardcoded WebSocket configuration that caused mixed content errors
+  - Users no longer need to manually configure `WS_PROTOCOL`, `WS_HOST`, or `WS_PORT` in most scenarios
+
+### Added
+- Console logging control via `ENABLE_CONSOLE_LOGS` environment variable
+  - Set to `false` to suppress all console output
+  - Useful for running as a background service or reducing console noise
+  - Works in conjunction with existing `LOG_LEVEL` setting
+- Comprehensive documentation for WebSocket auto-detection in `CONFIGURATION.md`
+- Troubleshooting section for `NODE_ENV=production` WebSocket connection issues
+
+### Changed
+- WebSocket configuration now defaults to automatic detection instead of manual settings
+- Updated `.env.example` with clearer documentation about WebSocket auto-detection
+- Enhanced logger class with console output toggle functionality
+- Improved configuration documentation with production mode examples
+
+### Technical Details
+- Modified `src/config.ts` `getWebSocketUrl()` to return `'auto'` when WebSocket settings are not explicitly configured
+- Enhanced `public/js/config.js` to dynamically construct WebSocket URLs from `window.location`
+- Updated `src/logger.ts` with `consoleLogsEnabled` property and related methods
+
 ## [1.0.0] - 2025-10-30
 
 ### Added
@@ -124,4 +152,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This is the initial release of VRCIM. For future updates, changes will be documented following the categories: Added, Changed, Deprecated, Removed, Fixed, and Security.
 
+[1.0.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/SweetSamanthaVR/VRCIM/releases/tag/v1.0.0
