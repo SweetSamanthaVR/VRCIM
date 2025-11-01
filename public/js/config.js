@@ -25,8 +25,9 @@ async function loadConfig() {
     } catch (error) {
         console.error('❌ Failed to load configuration:', error);
         // Fallback to defaults if config fetch fails
+        // Use 'auto' to dynamically construct WebSocket URL from window.location
         config = {
-            wsUrl: `ws://${window.location.hostname}:${window.location.port || 3000}`,
+            wsUrl: 'auto',
             nodeEnv: 'development'
         };
         console.warn('⚠ Using fallback configuration:', config);
@@ -40,6 +41,14 @@ async function loadConfig() {
  */
 async function getWebSocketUrl() {
     const cfg = await loadConfig();
+    
+    // If wsUrl is 'auto', construct it from current window location
+    // This ensures WebSocket connection works when accessing via IP address or any hostname
+    if (cfg.wsUrl === 'auto') {
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        return `${protocol}://${window.location.host}`;
+    }
+    
     return cfg.wsUrl;
 }
 

@@ -83,6 +83,75 @@ NODE_ENV=production
 - Development: More console logging, config displayed
 - Production: Cleaner logs, better performance
 
+**IMPORTANT - WebSocket Protocol in Production:**
+
+When using `NODE_ENV=production` **without HTTPS**, the WebSocket settings will auto-detect and use `ws://` (not `wss://`). 
+
+❌ **Common Mistake:**
+```bash
+NODE_ENV=production
+# Missing WS_PROTOCOL - will auto-detect correctly!
+```
+
+✅ **Correct - Auto-Detection (Recommended):**
+```bash
+NODE_ENV=production
+# Leave WebSocket settings commented out - they auto-detect!
+```
+
+The application automatically detects the correct protocol from your browser URL:
+- Accessing via `http://` → Uses `ws://`
+- Accessing via `https://` → Uses `wss://`
+
+**Only set `WS_PROTOCOL` manually if you have an advanced reverse proxy setup.**
+
+#### LOG_LEVEL
+
+**Description:** Control the verbosity of console logging output
+
+**Default:** `DEBUG` in development, `INFO` in production
+
+**Valid Values:**
+- `DEBUG` - Show all log messages (most verbose)
+- `INFO` - Show informational, warning, and error messages
+- `WARN` - Show only warnings and errors
+- `ERROR` - Show only error messages
+- `NONE` - Suppress all log messages
+
+**Example:**
+```bash
+LOG_LEVEL=INFO
+```
+
+**Usage:**
+- Use `DEBUG` when troubleshooting issues
+- Use `INFO` for normal operation
+- Use `WARN` or `ERROR` to reduce console noise
+- Use `NONE` to completely disable console logging
+
+#### ENABLE_CONSOLE_LOGS
+
+**Description:** Enable or disable all console logging output
+
+**Default:** `true`
+
+**Valid Values:**
+- `true` - Enable console logging
+- `false` - Disable all console output
+
+**Example:**
+```bash
+ENABLE_CONSOLE_LOGS=false
+```
+
+**Usage:**
+- Set to `false` to completely suppress console output
+- Useful when running as a background service
+- Can be combined with `LOG_LEVEL` for fine-grained control
+- When disabled, overrides `LOG_LEVEL` setting
+
+**Note:** Disabling console logs does not affect the application's functionality, only the visibility of log messages.
+
 ### Database Configuration
 
 #### DATABASE_PATH
@@ -139,13 +208,13 @@ VRCHAT_LOG_PATH=D:/VRChat/Logs
 
 ### WebSocket Configuration
 
-These settings are typically auto-configured and rarely need manual adjustment.
+These settings control how the frontend connects to the backend WebSocket server for real-time updates. Most users won't need to modify these settings as they are automatically configured.
 
 #### WS_PROTOCOL
 
 **Description:** WebSocket protocol (ws or wss)
 
-**Default:** `ws` (auto-detected based on NODE_ENV)
+**Default:** `ws` in development, `wss` in production (auto-detected)
 
 **Valid Values:**
 - `ws` - Unencrypted WebSocket
@@ -160,14 +229,29 @@ WS_PROTOCOL=ws
 
 #### WS_HOST
 
-**Description:** WebSocket server host
+**Description:** WebSocket server host (advanced users only)
 
-**Default:** Same as `HOST` setting
+**Default:** Auto-detected from current page URL (recommended)
 
 **Example:**
 ```bash
-WS_HOST=localhost
+# Only set this if you need a specific WebSocket host
+# WS_HOST=192.168.1.100
 ```
+
+**Important:** In most cases, you should NOT set this value. When left unset (commented out), the application automatically uses the same hostname that you use to access the web interface. This ensures WebSocket connections work correctly whether you access via:
+- `http://localhost:3000`
+- `http://127.0.0.1:3000`
+- `http://192.168.1.100:3000` (your local IP)
+- `http://your-computer-name:3000`
+
+**When to set:**
+- Advanced setups with reverse proxies
+- WebSocket server on different host than web server
+- Special networking configurations
+
+**Common Issues:**
+If users experience WebSocket connection timeouts, ensure `WS_HOST` is NOT set in your `.env` file. Remove or comment out the line to enable automatic detection.
 
 #### WS_PORT
 
@@ -179,6 +263,8 @@ WS_HOST=localhost
 ```bash
 WS_PORT=3000
 ```
+
+**Note:** Only change if WebSocket runs on different port than HTTP server.
 
 ### VR Notification Configuration
 
@@ -233,6 +319,7 @@ NODE_ENV=production
 DATABASE_PATH=./vrcim.db
 OVRTOOLKIT_ENABLED=true
 XSOVERLAY_ENABLED=true
+LOG_LEVEL=INFO
 ```
 
 ### Example 2: Network Access
@@ -243,9 +330,12 @@ PORT=3000
 HOST=0.0.0.0
 NODE_ENV=production
 DATABASE_PATH=./vrcim.db
+# Do NOT set WS_HOST - let it auto-detect!
 ```
 
 Access from other devices at: `http://YOUR_IP:3000`
+
+**Important:** Do not set `WS_HOST` when allowing network access. The application will automatically use the correct hostname.
 
 ### Example 3: Custom Paths
 
@@ -265,6 +355,7 @@ PORT=3001
 HOST=localhost
 NODE_ENV=development
 DATABASE_PATH=./dev_database.db
+LOG_LEVEL=DEBUG
 ```
 
 ### Example 5: Disable VR Notifications
@@ -275,6 +366,28 @@ PORT=3000
 NODE_ENV=production
 OVRTOOLKIT_ENABLED=false
 XSOVERLAY_ENABLED=false
+```
+
+### Example 6: Silent Background Service
+
+```bash
+# Run as background service with minimal console output
+PORT=3000
+HOST=0.0.0.0
+NODE_ENV=production
+DATABASE_PATH=./vrcim.db
+LOG_LEVEL=ERROR
+ENABLE_CONSOLE_LOGS=true
+```
+
+### Example 7: Completely Silent Operation
+
+```bash
+# Completely disable console logging
+PORT=3000
+NODE_ENV=production
+DATABASE_PATH=./vrcim.db
+ENABLE_CONSOLE_LOGS=false
 ```
 
 ## Advanced Configuration
@@ -364,6 +477,76 @@ Copy-Item .env .env.backup
 2. Ensure paths exist and have correct format
 3. Boolean values must be exactly `true` or `false`
 4. Remove extra spaces or quotes
+
+### WebSocket Connection Timeouts
+
+**Problem:** Web UI shows "Disconnected" or connection timeouts, but console logging works
+
+**Common Scenarios:**
+
+#### Scenario 1: Using NODE_ENV=production without HTTPS
+
+**Symptoms:**
+- Works fine with `NODE_ENV=development`
+- Fails with `NODE_ENV=production`
+- Browser console shows WebSocket connection errors
+
+**Root Cause:**
+The application now auto-detects the correct WebSocket protocol from your browser URL, so this should work automatically.
+
+**Solution:**
+1. **Ensure ALL WebSocket settings are commented out in `.env`:**
+   ```bash
+   # ✅ CORRECT - All commented out (auto-detect enabled)
+   # WS_PROTOCOL=ws
+   # WS_HOST=localhost
+   # WS_PORT=3000
+   ```
+
+2. **If you previously uncommented these, comment them back:**
+   ```bash
+   # ❌ WRONG - These override auto-detection
+   WS_PROTOCOL=ws
+   WS_HOST=localhost
+   ```
+
+3. **Restart the application:**
+   ```powershell
+   # Stop with Ctrl+C, then:
+   npm run build
+   npm start
+   ```
+
+#### Scenario 2: Explicitly Set WS_HOST
+
+**Problem:** `WS_HOST` is set in `.env`
+
+**Solution:**
+1. **Check if `WS_HOST` is set in `.env`**
+   ```bash
+   # WRONG - This will cause connection timeouts:
+   WS_HOST=localhost
+   
+   # CORRECT - Comment out or remove this line:
+   # WS_HOST=localhost
+   ```
+
+2. **Let the application auto-detect the correct WebSocket URL:**
+   - The application automatically uses the same hostname from your browser's address bar
+   - This works correctly whether accessing via `localhost`, IP address, or computer name
+
+3. **Verify WebSocket connection in browser:**
+   - Open browser console (F12)
+   - Look for WebSocket connection errors
+   - Should see: `✓ Configuration loaded:` with `wsUrl: "auto"`
+
+4. **Restart the application after making changes:**
+   ```powershell
+   # Stop with Ctrl+C, then:
+   npm start
+   ```
+
+**Root Cause:** When WebSocket settings are explicitly set, they override the auto-detection. The auto-detection ensures the browser connects using the same protocol (HTTP→WS, HTTPS→WSS) and host (localhost, IP, or hostname) as the page URL.
 
 ### File Path Issues
 

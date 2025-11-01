@@ -3,6 +3,7 @@
  * 
  * Provides structured logging with different severity levels.
  * Log level can be controlled via LOG_LEVEL environment variable.
+ * Console output can be disabled via ENABLE_CONSOLE_LOGS environment variable.
  * 
  * Log Levels (from lowest to highest priority):
  * - debug: Detailed information for diagnosing problems
@@ -21,6 +22,7 @@ export enum LogLevel {
 
 class Logger {
     private currentLevel: LogLevel;
+    private consoleLogsEnabled: boolean;
 
     constructor() {
         // Parse log level from environment variable
@@ -48,13 +50,17 @@ class Logger {
                     ? LogLevel.INFO 
                     : LogLevel.DEBUG;
         }
+
+        // Parse console logs enabled flag (default: true)
+        const envConsoleLogsEnabled = process.env.ENABLE_CONSOLE_LOGS?.toLowerCase();
+        this.consoleLogsEnabled = envConsoleLogsEnabled !== 'false';
     }
 
     /**
      * Check if a log level should be output
      */
     private shouldLog(level: LogLevel): boolean {
-        return level >= this.currentLevel;
+        return this.consoleLogsEnabled && level >= this.currentLevel;
     }
 
     /**
@@ -129,6 +135,20 @@ class Logger {
             case LogLevel.NONE: return 'NONE';
             default: return 'UNKNOWN';
         }
+    }
+
+    /**
+     * Enable or disable console logging output
+     */
+    setConsoleLogsEnabled(enabled: boolean): void {
+        this.consoleLogsEnabled = enabled;
+    }
+
+    /**
+     * Check if console logging is enabled
+     */
+    isConsoleLogsEnabled(): boolean {
+        return this.consoleLogsEnabled;
     }
 }
 
