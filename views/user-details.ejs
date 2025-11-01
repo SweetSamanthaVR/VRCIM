@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - VRCIM</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/<%= pageCSS %>">
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <main>
+        <div class="container">
+            <header class="page-header">
+                <div class="header-with-actions">
+                    <div>
+                        <h1>👤 User Profile</h1>
+                        <p>Live data from VRChat API</p>
+                    </div>
+                    <div class="header-actions">
+                        <button id="refresh-btn" class="btn btn-primary">🔄 Refresh from API</button>
+                        <a href="/users" class="btn btn-secondary">← Back to Users</a>
+                    </div>
+                </div>
+            </header>
+
+            <div id="content" class="content">
+                <!-- Loading State -->
+                <div id="loading-state" class="loading">Loading user profile...</div>
+                
+                <!-- Error State -->
+                <div id="error-state" class="error" style="display: none;">
+                    <h2 id="error-title">Error Loading Profile</h2>
+                    <p id="error-message"></p>
+                    <p id="error-additional" style="color: #aaa; margin-top: 10px;"></p>
+                    <div style="margin-top: 20px;">
+                        <a href="/" class="btn">← Back to Monitor</a>
+                    </div>
+                </div>
+                
+                <!-- Profile Content (populated by JavaScript) -->
+                <div id="profile-content" style="display: none;">
+                    <!-- Profile Card -->
+                    <div class="profile-card" id="profile-card"></div>
+                    
+                    <!-- Encounters Section -->
+                    <div class="encounters-section" id="encounters-section" style="display: none;">
+                        <h2>Encounter History</h2>
+                        <div class="encounter-list" id="encounter-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('partials/footer') %>
+    
+    <script src="/js/config.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/<%= pageJS %>"></script>
+</body>
+</html>

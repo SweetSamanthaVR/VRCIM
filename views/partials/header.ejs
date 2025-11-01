@@ -1,0 +1,23 @@
+<header class="site-header">
+    <div class="header-container">
+        <div class="header-logo">
+            <a href="/">
+                <h1>🎮 VRCIM</h1>
+                <p>VRChat Instance Monitor</p>
+            </a>
+        </div>
+        
+        <nav class="header-nav">
+            <a href="/" class="nav-link">Monitor</a>
+            <a href="/users" class="nav-link">Users</a>
+            <a href="/login" class="nav-link" id="login-link">Login</a>
+            
+            <div class="auth-status" id="header-auth-status" style="display: none;">
+                <span id="header-auth-indicator" class="auth-indicator"></span>
+                <span id="header-auth-text" id="username-display"></span>
+            </div>
+            
+            <button id="header-logout-btn" class="btn btn-logout" style="display: none;">Logout</button>
+        </nav>
+    </div>
+</header>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - VRCIM</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/<%= pageCSS %>">
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <main>
+        <div class="login-container">
+            <div class="logo">
+                <h1>🎮 VRChat Login</h1>
+                <p>VRCIM Authentication</p>
+            </div>
+
+            <div id="statusDisplay" style="display: none;">
+                <span class="status-badge" id="statusBadge"></span>
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <!-- User info will be populated by JavaScript -->
+                    <p><strong>Logged in as:</strong> <span id="user-display-name"></span></p>
+                    <p id="user-id-display" style="display: none;"><strong>User ID:</strong> <span id="user-id-value"></span></p>
+                </div>
+            </div>
+
+            <div id="alertBox" class="alert"></div>
+
+            <div class="loading" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p>Processing...</p>
+            </div>
+
+            <!-- Step 1: Username & Password -->
+            <form id="loginForm" class="form-step active">
+                <div class="form-group">
+                    <label for="username">VRChat Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn" id="loginBtn">Login to VRChat</button>
+
+                <p class="help-text">
+                    ⚠️ Your credentials are only used to authenticate with VRChat's API.
+                </p>
+            </form>
+
+            <!-- Step 2: 2FA Code -->
+            <form id="twoFactorForm" class="form-step">
+                <div class="form-group">
+                    <label for="twoFactorCode">Two-Factor Authentication Code</label>
+                    <input type="text" id="twoFactorCode" placeholder="Enter 6-digit code" maxlength="6" required autocomplete="one-time-code">
+                    <p class="help-text">
+                        📧 Check your email or authenticator app for the 6-digit code.
+                    </p>
+                </div>
+
+                <button type="submit" class="btn" id="verifyBtn">Verify & Login</button>
+                <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+            </form>
+
+            <!-- Logged In State -->
+            <div id="loggedInState" class="form-step">
+                <button type="button" class="btn btn-danger" id="logoutBtn">Logout</button>
+            </div>
+
+            <div class="back-link">
+                <a href="/">← Back to Dashboard</a>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('partials/footer') %>
+    
+    <script src="/js/config.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/<%= pageJS %>"></script>
+</body>
+</html>

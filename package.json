@@ -1,0 +1,33 @@
+{
+    "name": "vrcim",
+    "version": "1.0.0",
+    "description": "VRChat Instance Monitor",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "tsc && node dist/index.js",
+        "watch": "tsc -w"
+    },
+    "keywords": [
+        "vrchat",
+        "monitor"
+    ],
+    "author": "SweetSamanthaVR",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "^20.10.0",
+        "typescript": "^5.3.0"
+    },
+    "dependencies": {
+        "@types/better-sqlite3": "^7.6.13",
+        "@types/ejs": "^3.1.5",
+        "@types/express": "^5.0.4",
+        "@types/ws": "^8.18.1",
+        "axios": "^1.13.0",
+        "better-sqlite3": "^12.4.1",
+        "ejs": "^3.1.10",
+        "express": "^5.1.0",
+        "ws": "^8.18.3"
+    }
+}
