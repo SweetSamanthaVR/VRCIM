@@ -13,10 +13,34 @@ export class VRNotificationService {
     private xsoChecked: boolean = false;
     private readonly OVRT_WS_URL = 'ws://127.0.0.1:11450/api';
     private readonly XSO_UDP_PORT = 42069;
+    private paused: boolean = false;
 
     constructor() {
         // Try to connect to OVR Toolkit on initialization
         this.initializeOVRToolkit();
+    }
+
+    /**
+     * Pause VR notifications
+     */
+    pause(): void {
+        this.paused = true;
+        logger.info('🔇 VR notifications paused');
+    }
+
+    /**
+     * Resume VR notifications
+     */
+    resume(): void {
+        this.paused = false;
+        logger.info('🔔 VR notifications resumed');
+    }
+
+    /**
+     * Check if notifications are paused
+     */
+    isPaused(): boolean {
+        return this.paused;
     }
 
     /**
@@ -115,6 +139,12 @@ export class VRNotificationService {
      * Send VR notification (tries OVR Toolkit first, falls back to XSOverlay)
      */
     sendVisitorNotification(visitorName: string): void {
+        // Check if notifications are paused
+        if (this.paused) {
+            logger.debug(`🔇 Notification paused for visitor: ${visitorName}`);
+            return;
+        }
+
         const title = "⚠️ Visitor Detected";
         const body = `${visitorName} has joined the instance`;
 

@@ -5,6 +5,32 @@ All notable changes to VRCIM (VRChat Instance Monitor) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-11-01
+
+### Added
+- **VR Notification Control**: Added pause/resume button for in-game notifications
+  - New button in the web UI (Players in Instance section) to pause/resume VR notifications
+  - Real-time sync across all connected browser tabs via WebSocket
+  - Notifications can be paused without stopping the application
+  - Visual feedback with icon and text changes (🔔 Notifications On / 🔕 Notifications Off)
+  - Fully responsive design for mobile devices
+- New API endpoints for notification control:
+  - `GET /api/notifications/status` - Get current notification status
+  - `POST /api/notifications/pause` - Pause VR notifications
+  - `POST /api/notifications/resume` - Resume VR notifications
+
+### Changed
+- Enhanced `VRNotificationService` with pause/resume functionality
+- Updated WebSocket protocol to broadcast notification status changes
+- Improved section header layout to accommodate notification button
+
+### Technical Details
+- Modified `src/vrNotificationService.ts` with pause/resume methods
+- Updated `src/webserver.ts` with notification control endpoints
+- Enhanced `src/monitor.ts` to expose VR notification service
+- Added UI controls in `views/index.ejs` and `public/js/monitor.js`
+- Styled notification button in `public/css/monitor.css` with mobile responsiveness
+
 ## [1.0.1] - 2025-11-01
 
 ### Fixed
@@ -152,5 +178,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This is the initial release of VRCIM. For future updates, changes will be documented following the categories: Added, Changed, Deprecated, Removed, Fixed, and Security.
 
+[1.1.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/SweetSamanthaVR/VRCIM/releases/tag/v1.0.0

@@ -35,6 +35,13 @@ export class VRChatLogParser {
     }
 
     /**
+     * Get the VR notification service instance
+     */
+    getVRNotificationService(): VRNotificationService {
+        return this.vrNotificationService;
+    }
+
+    /**
      * Parse VRChat log content and extract events
      * 
      * @param content - The log file content to parse

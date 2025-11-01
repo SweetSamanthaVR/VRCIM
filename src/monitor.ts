@@ -366,4 +366,11 @@ export class VRChatMonitor {
 
         this.stopLogMonitoring();
     }
+
+    /**
+     * Get the VR notification service instance
+     */
+    getVRNotificationService() {
+        return this.logParser.getVRNotificationService();
+    }
 }
