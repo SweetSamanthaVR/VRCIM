@@ -169,9 +169,27 @@ export function getServerUrl(): string {
 
 /**
  * Get the full WebSocket URL
+ * Returns 'auto' to allow frontend to dynamically detect protocol and host
+ * This ensures WebSocket connections work correctly in all scenarios:
+ * - HTTP/HTTPS detection from browser
+ * - Localhost/IP/hostname detection from browser URL
+ * - Works in both development and production modes
  */
 export function getWebSocketUrl(): string {
-    return `${config.wsProtocol}://${config.wsHost}:${config.wsPort}`;
+    // Always return 'auto' unless WS_PROTOCOL is explicitly set
+    // This allows the frontend to intelligently detect:
+    // 1. Protocol: ws for http://, wss for https://
+    // 2. Host: Same as the page URL (localhost, IP, or hostname)
+    const isExplicitWsProtocol = process.env.WS_PROTOCOL !== undefined;
+    const isExplicitWsHost = process.env.WS_HOST !== undefined;
+    
+    if (isExplicitWsProtocol || isExplicitWsHost) {
+        // User has explicitly configured WebSocket settings, use them
+        return `${config.wsProtocol}://${config.wsHost}:${config.wsPort}`;
+    } else {
+        // Return 'auto' to signal frontend to auto-detect everything
+        return 'auto';
+    }
 }
 
 /**
