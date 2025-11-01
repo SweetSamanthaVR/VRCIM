@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - VRCIM</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/<%= pageCSS %>">
+</head>
+<body>
+    <%- include('partials/header') %>
+    
+    <main>
+        <div class="container">
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <div class="stat-label">Current World</div>
+                    <div class="stat-value stat-value-small" id="current-world">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Players in World</div>
+                    <div class="stat-value" id="players-in-world">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">API Queue</div>
+                    <div class="stat-value" id="api-queue">0</div>
+                    <div class="stat-label" style="margin-top: 5px; font-size: 10px;">1s per user</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Session Playtime</div>
+                    <div class="stat-value" id="session-playtime">0h 0m</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Current Session</div>
+                    <div class="stat-value" id="current-session">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Connection Status</div>
+                    <div class="stat-value" style="display: flex; align-items: center; gap: 8px;">
+                        <span id="status-indicator" class="status-dot offline"></span>
+                        <span id="status-text" style="font-size: 16px;">Disconnected</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Players in Instance Section -->
+            <div class="section-header">
+                <h2>👥 Players in Instance</h2>
+            </div>
+
+            <div class="players-section">
+                <div id="players-grid-container" class="players-grid-container">
+                    <div id="players-grid" class="players-grid"></div>
+                    <div id="no-vrchat-message" class="no-vrchat-message" style="display: none;">
+                        ⚠️ VRChat is not currently running
+                    </div>
+                </div>
+
+                <div class="pagination players-pagination">
+                    <button id="players-prev-page" disabled>← Previous</button>
+                    <span id="players-page-info">Page 1</span>
+                    <button id="players-next-page" disabled>Next →</button>
+                </div>
+            </div>
+
+            <!-- Recent Activity Section -->
+            <div class="section-header">
+                <h2>📋 Recent Activity</h2>
+            </div>
+
+            <div class="filters">
+                <label>
+                    <input type="checkbox" id="filter-world" checked> World Events
+                </label>
+                <label>
+                    <input type="checkbox" id="filter-player" checked> Player Events
+                </label>
+            </div>
+
+            <div class="logs-container">
+                <div id="logs-list">
+                    <!-- Logs will be populated here by JavaScript -->
+                </div>
+                
+                <!-- Empty State Template (hidden by default, shown when no logs) -->
+                <div id="empty-state-template" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">📭</div>
+                    <div class="empty-state-text">No logs available</div>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <button id="prev-page" disabled>← Previous</button>
+                <span id="page-info">Page 1</span>
+                <button id="next-page" disabled>Next →</button>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('partials/footer') %>
+    
+    <!-- HTML Templates for JavaScript (hidden from view) -->
+    <template id="log-entry-template">
+        <div class="log-entry">
+            <div class="log-header">
+                <div class="log-type"></div>
+                <div class="log-timestamp"></div>
+            </div>
+            <div class="log-details"></div>
+        </div>
+    </template>
+    
+    <template id="player-card-template">
+        <div class="player-card">
+            <div class="player-card-name"></div>
+            <div class="player-card-rank"></div>
+        </div>
+    </template>
+    
+    <script src="/js/config.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/<%= pageJS %>"></script>
+</body>
+</html>
