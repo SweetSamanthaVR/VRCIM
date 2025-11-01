@@ -30,6 +30,7 @@ export class WebServer {
     private database: VRChatDatabase;
     private authService: VRChatAuthService | null = null;
     private apiClient: VRChatAPIClient | null = null;
+    private monitor: any = null; // VRChatMonitor instance (typed as any to avoid circular dependency)
     private port: number;
     private host: string;
     private clients: Set<WebSocket> = new Set();
@@ -58,6 +59,13 @@ export class WebServer {
 
     setAPIClient(apiClient: VRChatAPIClient): void {
         this.apiClient = apiClient;
+    }
+
+    /**
+     * Set the monitor instance for notification control
+     */
+    setMonitor(monitor: any): void {
+        this.monitor = monitor;
     }
 
     /**
@@ -404,6 +412,73 @@ export class WebServer {
             });
         });
 
+        // VR Notifications Control
+        this.app.get('/api/notifications/status', (req, res) => {
+            if (!this.monitor) {
+                res.status(503).json({ success: false, error: 'Monitor not initialized' });
+                return;
+            }
+
+            try {
+                const vrService = this.monitor.getVRNotificationService();
+                res.json({
+                    success: true,
+                    paused: vrService.isPaused()
+                });
+            } catch (error) {
+                logger.error('Error getting notification status:', getErrorMessage(error));
+                res.status(500).json({ success: false, error: getErrorMessage(error) });
+            }
+        });
+
+        this.app.post('/api/notifications/pause', (req, res) => {
+            if (!this.monitor) {
+                res.status(503).json({ success: false, error: 'Monitor not initialized' });
+                return;
+            }
+
+            try {
+                const vrService = this.monitor.getVRNotificationService();
+                vrService.pause();
+                
+                // Broadcast status change to all connected clients
+                this.broadcastNotificationStatus(true);
+                
+                res.json({
+                    success: true,
+                    paused: true,
+                    message: 'VR notifications paused'
+                });
+            } catch (error) {
+                logger.error('Error pausing notifications:', getErrorMessage(error));
+                res.status(500).json({ success: false, error: getErrorMessage(error) });
+            }
+        });
+
+        this.app.post('/api/notifications/resume', (req, res) => {
+            if (!this.monitor) {
+                res.status(503).json({ success: false, error: 'Monitor not initialized' });
+                return;
+            }
+
+            try {
+                const vrService = this.monitor.getVRNotificationService();
+                vrService.resume();
+                
+                // Broadcast status change to all connected clients
+                this.broadcastNotificationStatus(false);
+                
+                res.json({
+                    success: true,
+                    paused: false,
+                    message: 'VR notifications resumed'
+                });
+            } catch (error) {
+                logger.error('Error resuming notifications:', getErrorMessage(error));
+                res.status(500).json({ success: false, error: getErrorMessage(error) });
+            }
+        });
+
         // View routes - Render EJS templates
         this.app.get('/', (req, res) => {
             res.render('index', {
@@ -498,7 +573,8 @@ export class WebServer {
                     currentSession: currentSession,
                     currentWorld: currentWorldInfo?.world_name || null,
                     currentWorldTimestamp: currentWorldInfo?.timestamp || null,
-                    playerCount: this.currentPlayerCount
+                    playerCount: this.currentPlayerCount,
+                    notificationsPaused: this.monitor ? this.monitor.getVRNotificationService().isPaused() : false
                 }));
             } catch (error) {
                 logger.error('Error sending initial data:', getErrorMessage(error));
@@ -633,6 +709,22 @@ export class WebServer {
 
         const message = JSON.stringify({
             type: 'vrchatClosed'
+        });
+
+        this.clients.forEach(client => {
+            if (client.readyState === 1) {
+                client.send(message);
+            }
+        });
+    }
+
+    /**
+     * Broadcast VR notification status change
+     */
+    broadcastNotificationStatus(paused: boolean): void {
+        const message = JSON.stringify({
+            type: 'notificationStatus',
+            paused
         });
 
         this.clients.forEach(client => {

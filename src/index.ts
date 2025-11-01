@@ -77,6 +77,7 @@ webServer.setAPIClient(apiClient);
  * - User profile fetching (if authenticated)
  */
 const monitor = new VRChatMonitor(database, webServer, apiClient);
+webServer.setMonitor(monitor); // Set monitor for notification control
 monitor.start();
 
 /**

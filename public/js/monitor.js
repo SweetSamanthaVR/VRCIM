@@ -31,6 +31,9 @@ let currentPlayers = new Map(); // Map of playerId -> { name, id, joinTime, cach
 let playersCurrentPage = 1;
 const playersPerPage = 20;
 
+// Notification state
+let notificationsPaused = false;
+
 // WebSocket connection
 let ws = null;
 
@@ -92,6 +95,9 @@ function setupEventListeners() {
             renderPlayerCards();
         }
     });
+
+    // Notification toggle button
+    document.getElementById('toggle-notifications-btn').addEventListener('click', toggleNotifications);
 
     // Manual reconnect button (will be added dynamically when needed)
     document.addEventListener('click', (e) => {
@@ -239,6 +245,8 @@ async function handleWebSocketMessage(data) {
             allLogs = data.logs || [];
             currentSessionUUID = data.currentSession || null;
             playersInWorld = data.playerCount || 0;
+            notificationsPaused = data.notificationsPaused || false;
+            updateNotificationButton();
             updateCurrentSession(currentSessionUUID);
             updatePlayerCount(playersInWorld);
 
@@ -256,6 +264,9 @@ async function handleWebSocketMessage(data) {
                 vrchatRunning = false;
                 showVRChatNotRunning();
             }
+        } else if (data.type === 'notificationStatus') {
+            notificationsPaused = data.paused;
+            updateNotificationButton();
         }
     } catch (error) {
         console.error('❌ Error handling WebSocket message:', error);
@@ -848,6 +859,57 @@ function showVRChatNotRunning() {
         </div>
     `;
     updatePaginationControls();
+}
+
+/**
+ * Toggle VR notifications on/off
+ */
+async function toggleNotifications() {
+    const btn = document.getElementById('toggle-notifications-btn');
+    btn.disabled = true;
+
+    try {
+        const endpoint = notificationsPaused ? '/api/notifications/resume' : '/api/notifications/pause';
+        const response = await fetch(endpoint, { method: 'POST' });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            notificationsPaused = data.paused;
+            updateNotificationButton();
+        } else {
+            throw new Error(data.error || 'Failed to toggle notifications');
+        }
+    } catch (error) {
+        console.error('❌ Failed to toggle notifications:', error);
+        displayErrorMessage('Notification Error', 'Failed to toggle VR notifications');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+/**
+ * Update notification button UI based on current state
+ */
+function updateNotificationButton() {
+    const btn = document.getElementById('toggle-notifications-btn');
+    const icon = document.getElementById('notification-icon');
+    const text = document.getElementById('notification-text');
+
+    if (notificationsPaused) {
+        btn.classList.add('paused');
+        icon.textContent = '🔕';
+        text.textContent = 'Notifications Off';
+        btn.title = 'Click to enable VR notifications';
+    } else {
+        btn.classList.remove('paused');
+        icon.textContent = '🔔';
+        text.textContent = 'Notifications On';
+        btn.title = 'Click to disable VR notifications';
+    }
 }
 
 // Initialize app when DOM is ready

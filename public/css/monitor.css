@@ -14,10 +14,59 @@
 /* Section Headers */
 .section-header {
     margin-bottom: var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
 }
 
 .section-header h2 {
     border-bottom: 2px solid var(--color-surface);
+    flex: 1;
+}
+
+/* Notification Toggle Button */
+.notification-toggle-btn {
+    background: var(--color-surface);
+    border: 2px solid var(--color-accent-primary);
+    color: var(--color-text-primary);
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.notification-toggle-btn:hover {
+    background: var(--color-surface-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.notification-toggle-btn:active {
+    transform: translateY(0);
+}
+
+.notification-toggle-btn:focus {
+    outline: 2px solid var(--color-accent-primary);
+    outline-offset: 2px;
+}
+
+.notification-toggle-btn.paused {
+    border-color: var(--color-accent-warning);
+}
+
+.notification-toggle-btn.paused:hover {
+    background: rgba(255, 165, 0, 0.1);
+}
+
+#notification-icon {
+    font-size: 18px;
 }
 
 /* Players Section */
@@ -300,7 +349,19 @@
         min-height: 300px;
     }
     
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
     .section-header h2 {
         font-size: 18px;
+        width: 100%;
+    }
+    
+    .notification-toggle-btn {
+        width: 100%;
+        justify-content: center;
     }
 }
