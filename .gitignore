@@ -10,3 +10,6 @@ dist/
 .env
 .env.local
 .env.*.local
+
+# External repositories (for reference only)
+VRCX/
