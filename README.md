@@ -13,7 +13,8 @@ A powerful real-time monitoring application for VRChat that tracks players, worl
 - 🌍 **World Activity** - Records all sessions with UUIDs
 - 🔗 **VRChat API Integration** - Fetches live profiles (60 req/min)
 - 🆕 **Visitor Detection** - Auto-refreshes Visitor profiles
-- 📱 **VR Notifications** - OVR Toolkit & XSOverlay support
+- � **Nuisance Player Alerts** - VRChat-flagged troll detection
+- �📱 **VR Notifications** - OVR Toolkit & XSOverlay support
 - ⚡ **Live WebSocket Updates** - Real-time dashboard
 - 🎨 **Modern Web UI** - Responsive dark theme
 - 💾 **SQLite Database** - Persistent storage with transactions
@@ -65,13 +66,16 @@ npm start
 
 ## VR Notifications
 
-When a Visitor joins your instance, VRCIM sends a 10-second notification to your VR headset showing their display name.
+VRCIM sends 10-second notifications to your VR headset for important events:
+
+- **🚨 Nuisance Players** - When a player with VRChat-applied nuisance tags joins (system_troll, system_probable_troll)
+- **⚠️ Visitors** - When a Visitor rank player joins your instance
 
 **Supported overlays:**
 - **OVR Toolkit** (WebSocket) - Recommended
 - **XSOverlay** (UDP)
 
-Notifications are sent automatically when either overlay is running.
+Notifications are sent automatically when either overlay is running. Nuisance alerts take priority over visitor alerts.
 
 ## Project Structure
 
@@ -154,5 +158,5 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-**Version:** 1.0.0  
-**Last Updated:** October 30, 2025
+**Version:** 1.2.0  
+**Last Updated:** November 1, 2025
