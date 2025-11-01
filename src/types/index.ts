@@ -145,10 +145,12 @@ export interface VRChatUser {
 }
 
 /**
- * Enriched user data (includes trust rank)
+ * Enriched user data (includes trust rank and nuisance detection)
  */
 export interface EnrichedUser extends VRChatUser {
     trustRank: string;
+    isNuisance?: boolean;
+    nuisanceType?: 'troll' | 'probable_troll' | null;
 }
 
 /**

@@ -5,6 +5,28 @@ All notable changes to VRCIM (VRChat Instance Monitor) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-11-01
+
+### Added
+- **Nuisance Player Detection**: Automatic detection and VR notification for players with VRChat-applied nuisance tags
+  - Detects `system_troll` tag (confirmed nuisance player)
+  - Detects `system_probable_troll` tag (probable nuisance player)
+  - Sends in-game VR notification when nuisance player joins: "🚨 [username] has joined and has a nuisance tag applied by VRChat — be alert"
+  - Nuisance notifications take priority over visitor notifications
+  - Console logging includes nuisance player warnings
+- New `isNuisance` and `nuisanceType` properties in `EnrichedUser` interface
+- Reference implementation based on VRCX's nuisance detection system
+
+### Changed
+- Enhanced `VRChatAPIClient.enrichUserData()` to detect nuisance tags
+- Updated `VRNotificationService` with `sendNuisanceNotification()` method
+- Modified player join notification logic to prioritize nuisance alerts
+
+### Technical Details
+- Added `detectNuisancePlayer()` method to VRChat API client
+- Tags checked: `system_troll`, `system_probable_troll`
+- VRCX repository added to `.gitignore` (for reference only, not included in commits)
+
 ## [1.1.0] - 2025-11-01
 
 ### Added
@@ -178,6 +200,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This is the initial release of VRCIM. For future updates, changes will be documented following the categories: Added, Changed, Deprecated, Removed, Fixed, and Security.
 
+[1.2.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/SweetSamanthaVR/VRCIM/releases/tag/v1.0.0

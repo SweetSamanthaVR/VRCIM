@@ -164,6 +164,35 @@ export class VRNotificationService {
     }
 
     /**
+     * Send VR notification for nuisance player
+     */
+    sendNuisanceNotification(playerName: string, nuisanceType: 'troll' | 'probable_troll'): void {
+        // Check if notifications are paused
+        if (this.paused) {
+            logger.debug(`🔇 Notification paused for nuisance player: ${playerName}`);
+            return;
+        }
+
+        const title = "🚨 Nuisance Player Alert";
+        const typeText = nuisanceType === 'troll' ? 'nuisance tag' : 'probable nuisance tag';
+        const body = `${playerName} has joined and has a ${typeText} applied by VRChat — be alert`;
+
+        logger.warn(`🚨 Nuisance player detected: ${playerName} (${nuisanceType})`);
+
+        // Try OVR Toolkit first (if connected)
+        if (this.ovrtConnected) {
+            this.sendOVRToolkitNotification(title, body);
+        } else {
+            // Use XSOverlay if OVR Toolkit is not available
+            if (!this.xsoChecked) {
+                logger.info('ℹ XSOverlay notification sent (unable to verify connection status)');
+                this.xsoChecked = true;
+            }
+            this.sendXSOverlayNotification(title, body);
+        }
+    }
+
+    /**
      * Close connections
      */
     close(): void {

@@ -227,12 +227,31 @@ export class VRChatAPIClient {
     }
 
     /**
-     * Enrich user data with calculated trust rank
+     * Enrich user data with calculated trust rank and nuisance detection
      */
     enrichUserData(user: VRChatUser): EnrichedUser {
+        const trustRank = this.getUserTrustRank(user.tags);
+        const nuisanceDetection = this.detectNuisancePlayer(user.tags);
+        
         return {
             ...user,
-            trustRank: this.getUserTrustRank(user.tags),
+            trustRank,
+            isNuisance: nuisanceDetection.isNuisance,
+            nuisanceType: nuisanceDetection.nuisanceType,
         };
+    }
+
+    /**
+     * Detect if a user has nuisance tags applied by VRChat
+     * Tags: system_troll, system_probable_troll
+     */
+    private detectNuisancePlayer(tags: string[]): { isNuisance: boolean; nuisanceType: 'troll' | 'probable_troll' | null } {
+        if (tags.includes('system_troll')) {
+            return { isNuisance: true, nuisanceType: 'troll' };
+        }
+        if (tags.includes('system_probable_troll')) {
+            return { isNuisance: true, nuisanceType: 'probable_troll' };
+        }
+        return { isNuisance: false, nuisanceType: null };
     }
 }

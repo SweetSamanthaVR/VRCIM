@@ -299,8 +299,15 @@ export class VRChatLogParser {
                     logger.info(`   ✅ Cached user: ${username} (${enrichedUser.trustRank})`);
                 }
                 
-                // Send VR notification if user is a Visitor
-                if (enrichedUser.trustRank && enrichedUser.trustRank.toLowerCase() === 'visitor') {
+                // Send VR notification for nuisance players (takes priority over visitor notifications)
+                if (enrichedUser.isNuisance && enrichedUser.nuisanceType) {
+                    this.vrNotificationService.sendNuisanceNotification(
+                        enrichedUser.displayName || username,
+                        enrichedUser.nuisanceType
+                    );
+                }
+                // Send VR notification if user is a Visitor (only if not a nuisance player)
+                else if (enrichedUser.trustRank && enrichedUser.trustRank.toLowerCase() === 'visitor') {
                     this.vrNotificationService.sendVisitorNotification(enrichedUser.displayName || username);
                 }
                 
