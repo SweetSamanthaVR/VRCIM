@@ -102,6 +102,8 @@
     </main>
     
     <%- include('partials/footer') %>
+    <!-- Runtime UI configuration (served as external script for CSP compliance) -->
+    <script src="/ui-config.js"></script>
     
     <!-- HTML Templates for JavaScript (hidden from view) -->
     <template id="log-entry-template">

@@ -124,7 +124,7 @@ export class WebServer {
         this.app.get('/api/logs', (req, res) => {
             try {
                 // Validate and sanitize limit parameter
-                const limit = validateLimit(req.query.limit, 100, 1000);
+                const limit = validateLimit(req.query.limit, config.recentActivityLimit, 1000);
 
                 // Get combined logs from both tables
                 const worldLogs = this.database.getWorldActivity(limit);
@@ -408,8 +408,21 @@ export class WebServer {
         this.app.get('/api/config', (req, res) => {
             res.json({
                 wsUrl: getWebSocketUrl(),
-                nodeEnv: config.nodeEnv
+                nodeEnv: config.nodeEnv,
+                playersPerPage: config.playersPerPage,
+                recentActivityLimit: config.recentActivityLimit,
+                cachedUsersPerPage: config.cachedUsersPerPage
             });
+        });
+
+        // Dynamic UI config script to avoid inline <script> (CSP compliant)
+        this.app.get('/ui-config.js', (req, res) => {
+            res.type('application/javascript').send(
+                `// UI configuration injected at runtime\n` +
+                `window.PLAYERS_PER_PAGE = ${config.playersPerPage};\n` +
+                `window.RECENT_ACTIVITY_LIMIT = ${config.recentActivityLimit};\n` +
+                `window.CACHED_USERS_PER_PAGE = ${config.cachedUsersPerPage};\n`
+            );
         });
 
         // VR Notifications Control
@@ -484,7 +497,11 @@ export class WebServer {
             res.render('index', {
                 title: 'VRChat Instance Monitor',
                 pageCSS: 'monitor.css',
-                pageJS: 'monitor.js'
+                pageJS: 'monitor.js',
+                uiConfig: {
+                    playersPerPage: config.playersPerPage,
+                    recentActivityLimit: config.recentActivityLimit
+                }
             });
         });
 
@@ -500,7 +517,10 @@ export class WebServer {
             res.render('users', {
                 title: 'Cached Users',
                 pageCSS: 'users.css',
-                pageJS: 'users.js'
+                pageJS: 'users.js',
+                uiConfig: {
+                    cachedUsersPerPage: config.cachedUsersPerPage
+                }
             });
         });
 
@@ -527,7 +547,7 @@ export class WebServer {
                 // Do NOT fall back to database as that would show stale sessions
                 const currentSession = this.currentSessionUUID;
                 
-                const worldLogs = this.database.getWorldActivity(50);
+                const worldLogs = this.database.getWorldActivity(config.recentActivityLimit);
                 
                 // Get ALL player activity for current session (not just last 50)
                 // This ensures all player join/leave events are available for rebuilding the player list
@@ -535,7 +555,7 @@ export class WebServer {
                 if (currentSession) {
                     playerLogs = this.database.getPlayerActivityBySession(currentSession);
                 } else {
-                    playerLogs = this.database.getPlayerActivityRecent(50);
+                    playerLogs = this.database.getPlayerActivityRecent(config.recentActivityLimit);
                 }
 
                 const allLogs = [
@@ -574,7 +594,10 @@ export class WebServer {
                     currentWorld: currentWorldInfo?.world_name || null,
                     currentWorldTimestamp: currentWorldInfo?.timestamp || null,
                     playerCount: this.currentPlayerCount,
-                    notificationsPaused: this.monitor ? this.monitor.getVRNotificationService().isPaused() : false
+                    notificationsPaused: this.monitor ? this.monitor.getVRNotificationService().isPaused() : false,
+                    playersPerPage: config.playersPerPage,
+                    recentActivityLimit: config.recentActivityLimit,
+                    cachedUsersPerPage: config.cachedUsersPerPage
                 }));
             } catch (error) {
                 logger.error('Error sending initial data:', getErrorMessage(error));
