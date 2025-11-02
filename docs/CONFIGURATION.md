@@ -307,6 +307,54 @@ XSOVERLAY_ENABLED=true
 - Sends via UDP to localhost:42069
 
 **Note:** You can enable both. VRCIM will send to whichever is running.
+### Pagination & Display Configuration
+
+Control how many items are shown per page across different UI sections.
+
+#### PLAYERS_PER_PAGE
+
+**Description:** Number of player cards to show per page in the "Players in Instance" section.
+
+**Default:** `20`
+
+**Valid Values:** `1-200`
+
+**Example:**
+```bash
+PLAYERS_PER_PAGE=24
+```
+
+**Notes:** Higher values may increase page height and reduce clarity. Visitors are prioritized visually.
+
+#### RECENT_ACTIVITY_LIMIT
+
+**Description:** Number of recent log entries (world + player events) fetched from backend and supplied to the dashboard.
+
+**Default:** `50`
+
+**Valid Values:** `1-1000`
+
+**Example:**
+```bash
+RECENT_ACTIVITY_LIMIT=100
+```
+
+**Usage:** Affects initial WebSocket payload and `/api/logs` default limit when the `limit` query parameter is not provided.
+
+#### CACHED_USERS_PER_PAGE
+
+**Description:** Number of cached user profiles shown per page on the Cached Users screen.
+
+**Default:** `50`
+
+**Valid Values:** `1-500`
+
+**Example:**
+```bash
+CACHED_USERS_PER_PAGE=75
+```
+
+**Notes:** Frontend pagination uses this value. Very large values can impact scroll performance.
 
 ## Configuration Examples
 

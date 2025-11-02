@@ -15,7 +15,8 @@ let filteredUsers = [];
 let totalUsersCount = 0; // Total count from server for pagination
 let currentFilter = 'all';
 let currentPage = 1;
-const USERS_PER_PAGE = 50;
+let USERS_PER_PAGE = window.CACHED_USERS_PER_PAGE || 50; // Configurable from backend injection
+console.log('[VRCIM] Initial USERS_PER_PAGE:', USERS_PER_PAGE);
 
 // Virtual scrolling configuration
 const CARD_HEIGHT = 150; // Approximate height of each user card in pixels
@@ -121,6 +122,7 @@ async function loadUsers() {
         
         // Fetch users with server-side pagination (50 per page)
         const response = await fetch(`/api/users/cached?limit=${USERS_PER_PAGE}&offset=${offset}`);
+        console.debug('[VRCIM] Fetch cached users page:', currentPage, 'limit=', USERS_PER_PAGE, 'offset=', offset);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -128,16 +130,24 @@ async function loadUsers() {
         
         const data = await response.json();
         allUsers = data.users || [];
+        console.debug('[VRCIM] API returned users count:', allUsers.length, 'requested limit=', USERS_PER_PAGE);
         
         // Store total count for pagination
         totalUsersCount = data.pagination?.total || allUsers.length;
         updateStatsSummary(totalUsersCount);
         
-        // For server-side pagination, filteredUsers is the same as allUsers
-        filteredUsers = allUsers;
+        // For server-side (base) view, start with a sliced subset immediately
+        const searchTerm = document.getElementById('searchInput')?.value || '';
+        const baseView = !searchTerm && currentFilter === 'all';
+        if (baseView) {
+            filteredUsers = allUsers.slice(0, USERS_PER_PAGE);
+            console.debug('[VRCIM] Base view immediate slice applied:', USERS_PER_PAGE, 'showing=', filteredUsers.length);
+        } else {
+            filteredUsers = allUsers;
+        }
         
         // Apply search/filter (will need to reload from server if filtering)
-        const searchTerm = document.getElementById('searchInput')?.value || '';
+        // Reuse earlier declared searchTerm (avoid duplicate const declaration under CSP enforced conditions)
         if (searchTerm || currentFilter !== 'all') {
             // If search/filter is active, fall back to client-side filtering
             // by loading all users (we'll optimize this in a future update)
@@ -215,7 +225,14 @@ function applyFilters(searchTerm, filter) {
         });
     }
 
-    filteredUsers = filtered;
+    // If returning to base (no search & 'all'), enforce server-side page slice
+    const baseView = !searchTerm && filter === 'all';
+    if (baseView) {
+        filteredUsers = filtered.slice(0, USERS_PER_PAGE);
+        console.debug('[VRCIM] Base view slice applied for cached users:', USERS_PER_PAGE, 'originalLength=', filtered.length);
+    } else {
+        filteredUsers = filtered;
+    }
     currentPage = 1; // Reset to first page
     displayCurrentPage();
 }
@@ -230,17 +247,17 @@ function displayCurrentPage() {
     
     let usersToDisplay;
     if (isFiltering) {
-        // Client-side pagination when filtering
         const startIndex = (currentPage - 1) * USERS_PER_PAGE;
         const endIndex = startIndex + USERS_PER_PAGE;
         usersToDisplay = filteredUsers.slice(startIndex, endIndex);
     } else {
-        // Server-side pagination (all users from allUsers are already the right page)
-        usersToDisplay = allUsers;
+        // Ensure slice again defensively
+        usersToDisplay = filteredUsers.slice(0, USERS_PER_PAGE);
     }
     
     // Enable virtual scrolling if we have many users
-    virtualScrollState.isEnabled = filteredUsers.length > 100;
+    // Disable virtual scrolling in base view to avoid bypassing slice
+    virtualScrollState.isEnabled = (filteredUsers.length > 100) && isFiltering;
     
     displayUsers(usersToDisplay);
     updatePagination();
@@ -352,6 +369,7 @@ function updatePagination() {
     const isFiltering = currentFilter !== 'all' || (document.getElementById('searchInput')?.value || '').trim() !== '';
     const totalCount = isFiltering ? filteredUsers.length : totalUsersCount;
     const totalPages = Math.ceil(totalCount / USERS_PER_PAGE);
+    console.debug('[VRCIM] Update pagination: totalCount=', totalCount, 'usersPerPage=', USERS_PER_PAGE, 'totalPages=', totalPages, 'currentPage=', currentPage);
     
     const paginationDiv = document.getElementById('pagination');
     const prevBtn = document.getElementById('prevPage');
@@ -384,7 +402,6 @@ function displayUsers(users) {
     if (filteredUsers.length === 0) {
         // Show no results state
         noResultsState.style.display = 'block';
-        usersGrid.style.display = 'none';
         
         const noResultsHint = document.getElementById('no-results-hint');
         if (currentFilter !== 'all' || document.getElementById('searchInput').value) {
@@ -394,7 +411,6 @@ function displayUsers(users) {
         }
         return;
     }
-
     // Hide no results, show grid
     noResultsState.style.display = 'none';
     usersGrid.style.display = 'grid';

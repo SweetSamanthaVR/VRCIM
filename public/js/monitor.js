@@ -17,7 +17,8 @@
 let allLogs = [];
 let filteredLogs = [];
 let currentPage = 1;
-const logsPerPage = 15;
+let logsPerPage = window.RECENT_ACTIVITY_LIMIT || 15; // Dynamically set from backend injection
+console.log('[VRCIM] Initial logsPerPage (pre-WS):', logsPerPage);
 let isConnected = false;
 let currentSessionUUID = null;
 let playersInWorld = 0;
@@ -29,7 +30,8 @@ let vrchatRunning = false;
 // Player cards state
 let currentPlayers = new Map(); // Map of playerId -> { name, id, joinTime, cached, trustRank }
 let playersCurrentPage = 1;
-const playersPerPage = 20;
+let playersPerPage = window.PLAYERS_PER_PAGE || 20; // Configurable from backend (injected via EJS). Will be overridden by WebSocket initialData if provided.
+console.log('[VRCIM] Initial playersPerPage (pre-WS):', playersPerPage);
 
 // Notification state
 let notificationsPaused = false;
@@ -250,6 +252,22 @@ async function handleWebSocketMessage(data) {
             updateCurrentSession(currentSessionUUID);
             updatePlayerCount(playersInWorld);
 
+            // Override playersPerPage if server provided (ensures env is respected even if window variable missing)
+            if (typeof data.playersPerPage === 'number' && data.playersPerPage > 0) {
+                playersPerPage = data.playersPerPage;
+                console.log('[VRCIM] Applied playersPerPage from server initialData:', playersPerPage);
+            } else {
+                console.log('[VRCIM] No playersPerPage in initialData, using existing value:', playersPerPage);
+            }
+
+            // Override logsPerPage if server provided recentActivityLimit
+            if (typeof data.recentActivityLimit === 'number' && data.recentActivityLimit > 0) {
+                logsPerPage = data.recentActivityLimit;
+                console.log('[VRCIM] Applied logsPerPage (recentActivityLimit) from server initialData:', logsPerPage);
+            } else {
+                console.log('[VRCIM] No recentActivityLimit in initialData, using existing logsPerPage:', logsPerPage);
+            }
+
             // VRChat is only running if we have both a current session AND current world
             if (currentSessionUUID && data.currentWorld) {
                 vrchatRunning = true;
@@ -347,6 +365,7 @@ function renderLogs() {
 
     const startIndex = (currentPage - 1) * logsPerPage;
     const endIndex = startIndex + logsPerPage;
+    console.debug('[VRCIM] Render logs: totalFiltered=', filteredLogs.length, 'logsPerPage=', logsPerPage, 'currentPage=', currentPage);
     const pageData = filteredLogs.slice(startIndex, endIndex);
 
     logsContainer.innerHTML = pageData.map(log => createLogHTML(log)).join('');
@@ -771,6 +790,10 @@ function renderPlayerCards() {
 
     // Calculate pagination
     const totalPages = Math.ceil(playersArray.length / playersPerPage);
+    // Debug output for troubleshooting pagination issues
+    if (playersArray.length > 0) {
+        console.debug('[VRCIM] Render players: total=', playersArray.length, 'perPage=', playersPerPage, 'totalPages=', totalPages, 'currentPage=', playersCurrentPage);
+    }
     const startIdx = (playersCurrentPage - 1) * playersPerPage;
     const endIdx = startIdx + playersPerPage;
     const playersToShow = playersArray.slice(startIdx, endIdx);

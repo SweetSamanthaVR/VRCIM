@@ -31,6 +31,11 @@ export interface AppConfig {
     wsProtocol: string;
     wsHost: string;
     wsPort: number;
+
+    // Pagination & Display Configuration
+    playersPerPage: number;
+    recentActivityLimit: number;
+    cachedUsersPerPage: number;
 }
 
 /**
@@ -84,6 +89,19 @@ function loadConfig(): AppConfig {
     const wsProtocol = process.env.WS_PROTOCOL || (nodeEnv === 'production' ? 'wss' : 'ws');
     const wsHost = process.env.WS_HOST || host;
     const wsPort = process.env.WS_PORT ? parseInt(process.env.WS_PORT) : port;
+
+    // Helper to safely parse bounded positive integers
+    const parsePositiveInt = (raw: string | undefined, def: number, min: number, max: number): number => {
+        if (!raw) return def;
+        const n = parseInt(raw.trim(), 10);
+        if (isNaN(n) || n < min) return def;
+        return Math.min(n, max);
+    };
+
+    // Pagination & Display Configuration
+    const playersPerPage = parsePositiveInt(process.env.PLAYERS_PER_PAGE, 20, 1, 200);
+    const recentActivityLimit = parsePositiveInt(process.env.RECENT_ACTIVITY_LIMIT, 50, 1, 1000);
+    const cachedUsersPerPage = parsePositiveInt(process.env.CACHED_USERS_PER_PAGE, 50, 1, 500);
     
     return {
         port,
@@ -95,7 +113,10 @@ function loadConfig(): AppConfig {
         xsOverlayEnabled,
         wsProtocol,
         wsHost,
-        wsPort
+        wsPort,
+        playersPerPage,
+        recentActivityLimit,
+        cachedUsersPerPage
     };
 }
 
@@ -145,6 +166,9 @@ function displayConfig(config: AppConfig): void {
     logger.info(`   OVR Toolkit: ${config.ovrToolkitEnabled ? 'Enabled' : 'Disabled'}`);
     logger.info(`   XSOverlay: ${config.xsOverlayEnabled ? 'Enabled' : 'Disabled'}`);
     logger.info(`   Log Level: ${logger.getLevelName()}`);
+    logger.info(`   Players/Page: ${config.playersPerPage}`);
+    logger.info(`   Recent Activity Limit: ${config.recentActivityLimit}`);
+    logger.info(`   Cached Users/Page: ${config.cachedUsersPerPage}`);
 }
 
 // Load configuration once at module initialization
