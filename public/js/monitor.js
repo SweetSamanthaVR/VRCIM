@@ -29,7 +29,7 @@ let vrchatRunning = false;
 // Player cards state
 let currentPlayers = new Map(); // Map of playerId -> { name, id, joinTime, cached, trustRank }
 let playersCurrentPage = 1;
-const playersPerPage = 20;
+let playersPerPage = 20; // Will be loaded from config
 
 // Notification state
 let notificationsPaused = false;
@@ -48,7 +48,16 @@ const MAX_RECONNECT_ATTEMPTS = 10; // After this, require manual retry
 /**
  * Initialize the monitor application
  */
-function init() {
+async function init() {
+    // Load configuration first
+    try {
+        playersPerPage = await getPlayersPerPage();
+        console.log(`✓ Players per page: ${playersPerPage}`);
+    } catch (error) {
+        console.warn('⚠ Failed to load players per page config, using default:', error);
+        playersPerPage = 20;
+    }
+    
     setupEventListeners();
     connectWebSocket();
     // Don't load initial data here - wait for WebSocket initialData message

@@ -15,7 +15,7 @@ let filteredUsers = [];
 let totalUsersCount = 0; // Total count from server for pagination
 let currentFilter = 'all';
 let currentPage = 1;
-const USERS_PER_PAGE = 50;
+let USERS_PER_PAGE = 50; // Will be loaded from config
 
 // Virtual scrolling configuration
 const CARD_HEIGHT = 150; // Approximate height of each user card in pixels
@@ -32,7 +32,16 @@ let virtualScrollState = {
 /**
  * Initialize users page
  */
-function init() {
+async function init() {
+    // Load configuration first
+    try {
+        USERS_PER_PAGE = await getCachedUsersPerPage();
+        console.log(`✓ Cached users per page: ${USERS_PER_PAGE}`);
+    } catch (error) {
+        console.warn('⚠ Failed to load cached users per page config, using default:', error);
+        USERS_PER_PAGE = 50;
+    }
+    
     setupEventListeners();
     loadUsers();
 }
