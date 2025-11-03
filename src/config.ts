@@ -31,6 +31,11 @@ export interface AppConfig {
     wsProtocol: string;
     wsHost: string;
     wsPort: number;
+    
+    // Pagination Configuration
+    playersPerPage: number;
+    recentActivityLimit: number;
+    cachedUsersPerPage: number;
 }
 
 /**
@@ -85,6 +90,11 @@ function loadConfig(): AppConfig {
     const wsHost = process.env.WS_HOST || host;
     const wsPort = process.env.WS_PORT ? parseInt(process.env.WS_PORT) : port;
     
+    // Pagination Configuration
+    const playersPerPage = Math.min(Math.max(parseInt(process.env.PLAYERS_PER_PAGE || '20'), 1), 200);
+    const recentActivityLimit = Math.min(Math.max(parseInt(process.env.RECENT_ACTIVITY_LIMIT || '50'), 1), 1000);
+    const cachedUsersPerPage = Math.min(Math.max(parseInt(process.env.CACHED_USERS_PER_PAGE || '50'), 1), 500);
+    
     return {
         port,
         host,
@@ -95,7 +105,10 @@ function loadConfig(): AppConfig {
         xsOverlayEnabled,
         wsProtocol,
         wsHost,
-        wsPort
+        wsPort,
+        playersPerPage,
+        recentActivityLimit,
+        cachedUsersPerPage
     };
 }
 
@@ -145,6 +158,9 @@ function displayConfig(config: AppConfig): void {
     logger.info(`   OVR Toolkit: ${config.ovrToolkitEnabled ? 'Enabled' : 'Disabled'}`);
     logger.info(`   XSOverlay: ${config.xsOverlayEnabled ? 'Enabled' : 'Disabled'}`);
     logger.info(`   Log Level: ${logger.getLevelName()}`);
+    logger.info(`   Players Per Page: ${config.playersPerPage}`);
+    logger.info(`   Recent Activity Limit: ${config.recentActivityLimit}`);
+    logger.info(`   Cached Users Per Page: ${config.cachedUsersPerPage}`);
 }
 
 // Load configuration once at module initialization

@@ -69,3 +69,30 @@ async function isProduction() {
     const cfg = await loadConfig();
     return cfg.nodeEnv === 'production';
 }
+
+/**
+ * Get players per page from configuration
+ * @returns {Promise<number>}
+ */
+async function getPlayersPerPage() {
+    const cfg = await loadConfig();
+    return cfg.playersPerPage || 20;
+}
+
+/**
+ * Get recent activity limit from configuration
+ * @returns {Promise<number>}
+ */
+async function getRecentActivityLimit() {
+    const cfg = await loadConfig();
+    return cfg.recentActivityLimit || 50;
+}
+
+/**
+ * Get cached users per page from configuration
+ * @returns {Promise<number>}
+ */
+async function getCachedUsersPerPage() {
+    const cfg = await loadConfig();
+    return cfg.cachedUsersPerPage || 50;
+}

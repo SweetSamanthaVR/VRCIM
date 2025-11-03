@@ -5,6 +5,29 @@ All notable changes to VRCIM (VRChat Instance Monitor) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-11-03
+
+### Added
+- **Configurable Pagination Settings**: Added three new environment variables for customizable pagination
+  - `PLAYERS_PER_PAGE` (1-200, default: 20) - Controls players shown per page in "Players in Instance" section
+  - `RECENT_ACTIVITY_LIMIT` (1-1000, default: 50) - Number of recent activity log entries fetched for dashboard and `/api/logs` endpoint
+  - `CACHED_USERS_PER_PAGE` (1-500, default: 50) - Cached user profiles displayed per page in Users list
+  - All settings have validation with min/max bounds enforcement
+  - Settings are dynamically loaded by frontend from `/api/config` endpoint
+
+### Changed
+- Enhanced `/api/config` endpoint to expose pagination configuration to frontend
+- Updated dashboard, users list, and monitor pages to use dynamic pagination values
+- Modified WebSocket initial data to respect `RECENT_ACTIVITY_LIMIT` configuration
+- Improved configuration system with runtime validation and fallback defaults
+
+### Technical Details
+- Modified `src/config.ts` to parse and validate new pagination settings
+- Updated `AppConfig` interface with three new pagination properties
+- Enhanced `public/js/config.js` with helper functions: `getPlayersPerPage()`, `getRecentActivityLimit()`, `getCachedUsersPerPage()`
+- Modified `public/js/monitor.js` and `public/js/users.js` to load config asynchronously on initialization
+- Updated `.env.example` with comprehensive documentation for new settings
+
 ## [1.2.1] - 2025-11-01
 
 ### Changed
@@ -215,6 +238,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This is the initial release of VRCIM. For future updates, changes will be documented following the categories: Added, Changed, Deprecated, Removed, Fixed, and Security.
 
+[1.3.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.0.1...v1.1.0

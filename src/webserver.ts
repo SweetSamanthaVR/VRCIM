@@ -124,7 +124,7 @@ export class WebServer {
         this.app.get('/api/logs', (req, res) => {
             try {
                 // Validate and sanitize limit parameter
-                const limit = validateLimit(req.query.limit, 100, 1000);
+                const limit = validateLimit(req.query.limit, config.recentActivityLimit, 1000);
 
                 // Get combined logs from both tables
                 const worldLogs = this.database.getWorldActivity(limit);
@@ -408,7 +408,10 @@ export class WebServer {
         this.app.get('/api/config', (req, res) => {
             res.json({
                 wsUrl: getWebSocketUrl(),
-                nodeEnv: config.nodeEnv
+                nodeEnv: config.nodeEnv,
+                playersPerPage: config.playersPerPage,
+                recentActivityLimit: config.recentActivityLimit,
+                cachedUsersPerPage: config.cachedUsersPerPage
             });
         });
 
@@ -527,7 +530,7 @@ export class WebServer {
                 // Do NOT fall back to database as that would show stale sessions
                 const currentSession = this.currentSessionUUID;
                 
-                const worldLogs = this.database.getWorldActivity(50);
+                const worldLogs = this.database.getWorldActivity(config.recentActivityLimit);
                 
                 // Get ALL player activity for current session (not just last 50)
                 // This ensures all player join/leave events are available for rebuilding the player list
@@ -535,7 +538,7 @@ export class WebServer {
                 if (currentSession) {
                     playerLogs = this.database.getPlayerActivityBySession(currentSession);
                 } else {
-                    playerLogs = this.database.getPlayerActivityRecent(50);
+                    playerLogs = this.database.getPlayerActivityRecent(config.recentActivityLimit);
                 }
 
                 const allLogs = [
