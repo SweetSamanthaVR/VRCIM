@@ -1,4 +1,4 @@
-﻿# VRCIM - VRChat Instance Monitor
+# VRCIM - VRChat Instance Monitor
 
 A powerful real-time monitoring application for VRChat that tracks players, worlds, and visitor activity with VR notifications.
 
