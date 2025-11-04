@@ -1,5 +1,45 @@
+# ====================================
+# Git Line Ending Configuration
+# ====================================
+# Ensures consistent LF line endings across all platforms
+# Works with .editorconfig for complete formatting consistency
+# Reference: https://git-scm.com/docs/gitattributes
+
+# Default: Auto-detect text files and normalize to LF
 * text=auto eol=lf
+
+# Source Code Files (TypeScript, JavaScript)
 *.ts text eol=lf
 *.js text eol=lf
+
+# Configuration Files
 *.json text eol=lf
+*.env text eol=lf
+*.example text eol=lf
+
+# Documentation Files
 *.md text eol=lf
+*.txt text eol=lf
+
+# Web Files
+*.html text eol=lf
+*.css text eol=lf
+*.ejs text eol=lf
+
+# Shell Scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Windows Scripts (use CRLF)
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary Files (never modify)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.db binary
+*.sqlite binary

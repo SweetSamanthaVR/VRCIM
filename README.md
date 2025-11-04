@@ -158,5 +158,5 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-**Version:** 1.4.1  
+**Version:** 1.4.2  
 **Last Updated:** November 4, 2025
