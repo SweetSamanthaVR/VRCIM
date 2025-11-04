@@ -6,6 +6,9 @@ dist/
 *.db-shm
 *.db-wal
 
+# Package manager lock files
+package-lock.json
+
 # Environment variables
 .env
 .env.local

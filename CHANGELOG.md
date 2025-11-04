@@ -5,6 +5,23 @@ All notable changes to VRCIM (VRChat Instance Monitor) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2025-11-04
+
+### Changed
+- **Enhanced `.gitattributes` Configuration**: Improved Git line ending normalization with comprehensive file type coverage
+  - Added clear documentation and comments explaining purpose and usage
+  - Extended coverage to include HTML, CSS, EJS, shell scripts, and configuration files
+  - Proper handling of Windows scripts (CMD, BAT, PS1) with CRLF line endings
+  - Binary file protection for images and database files
+  - Works alongside `.editorconfig` for complete formatting consistency
+  - Prevents cross-platform line ending issues in collaborative development
+
+### Technical Details
+- Enhanced `.gitattributes` with 40+ file type definitions
+- Windows scripts (*.cmd, *.bat, *.ps1) explicitly use CRLF
+- Binary files (*.png, *.jpg, *.db) marked to prevent text conversion
+- All text files default to LF line endings for Unix/Linux compatibility
+
 ## [1.4.1] - 2025-11-04
 
 ### Fixed
@@ -288,6 +305,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This is the initial release of VRCIM. For future updates, changes will be documented following the categories: Added, Changed, Deprecated, Removed, Fixed, and Security.
 
+[1.4.2]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.3.0...v1.3.1
