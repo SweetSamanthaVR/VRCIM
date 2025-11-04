@@ -36,6 +36,9 @@ export interface AppConfig {
     playersPerPage: number;
     recentActivityLimit: number;
     cachedUsersPerPage: number;
+    
+    // Browser Configuration
+    autoOpenBrowser: boolean;
 }
 
 /**
@@ -95,6 +98,9 @@ function loadConfig(): AppConfig {
     const recentActivityLimit = Math.min(Math.max(parseInt(process.env.RECENT_ACTIVITY_LIMIT || '50'), 1), 1000);
     const cachedUsersPerPage = Math.min(Math.max(parseInt(process.env.CACHED_USERS_PER_PAGE || '50'), 1), 500);
     
+    // Browser Configuration
+    const autoOpenBrowser = process.env.AUTO_OPEN_BROWSER !== 'false'; // Default: true
+    
     return {
         port,
         host,
@@ -108,7 +114,8 @@ function loadConfig(): AppConfig {
         wsPort,
         playersPerPage,
         recentActivityLimit,
-        cachedUsersPerPage
+        cachedUsersPerPage,
+        autoOpenBrowser
     };
 }
 
@@ -161,6 +168,7 @@ function displayConfig(config: AppConfig): void {
     logger.info(`   Players Per Page: ${config.playersPerPage}`);
     logger.info(`   Recent Activity Limit: ${config.recentActivityLimit}`);
     logger.info(`   Cached Users Per Page: ${config.cachedUsersPerPage}`);
+    logger.info(`   Auto-Open Browser: ${config.autoOpenBrowser ? 'Enabled' : 'Disabled'}`);
 }
 
 // Load configuration once at module initialization
