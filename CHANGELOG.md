@@ -5,6 +5,20 @@ All notable changes to VRCIM (VRChat Instance Monitor) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2025-11-04
+
+### Fixed
+- **Recent Activity Pagination**: Fixed frontend pagination to respect `RECENT_ACTIVITY_LIMIT` configuration
+  - Recent Activity section now correctly uses the `RECENT_ACTIVITY_LIMIT` value from `.env` file
+  - Previously, frontend was hardcoded to display 15 logs per page regardless of configuration
+  - Frontend now dynamically loads pagination limit from config on initialization
+  - Matches the behavior of other configurable pagination settings (Players Per Page, Cached Users Per Page)
+
+### Changed
+- Modified `public/js/monitor.js` to load `RECENT_ACTIVITY_LIMIT` from configuration
+- Changed `logsPerPage` from constant to variable with default value of 50
+- Added async config loading for `logsPerPage` in `init()` function
+
 ## [1.4.0] - 2025-11-04
 
 ### Added
@@ -274,6 +288,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This is the initial release of VRCIM. For future updates, changes will be documented following the categories: Added, Changed, Deprecated, Removed, Fixed, and Security.
 
+[1.4.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.2.1...v1.3.0

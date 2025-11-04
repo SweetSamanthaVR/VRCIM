@@ -1,6 +1,6 @@
 {
     "name": "vrcim",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "VRChat Instance Monitor",
     "main": "dist/index.js",
     "scripts": {
