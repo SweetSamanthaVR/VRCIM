@@ -17,7 +17,7 @@
 let allLogs = [];
 let filteredLogs = [];
 let currentPage = 1;
-const logsPerPage = 15;
+let logsPerPage = 50; // Will be loaded from config
 let isConnected = false;
 let currentSessionUUID = null;
 let playersInWorld = 0;
@@ -56,6 +56,14 @@ async function init() {
     } catch (error) {
         console.warn('⚠ Failed to load players per page config, using default:', error);
         playersPerPage = 20;
+    }
+    
+    try {
+        logsPerPage = await getRecentActivityLimit();
+        console.log(`✓ Recent activity limit: ${logsPerPage}`);
+    } catch (error) {
+        console.warn('⚠ Failed to load recent activity limit config, using default:', error);
+        logsPerPage = 50;
     }
     
     setupEventListeners();
