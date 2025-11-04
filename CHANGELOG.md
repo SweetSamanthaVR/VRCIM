@@ -5,6 +5,36 @@ All notable changes to VRCIM (VRChat Instance Monitor) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-11-04
+
+### Added
+- **Auto-Open Browser on Startup**: Application now automatically opens the web interface in your default browser when the server starts
+  - Configurable via `AUTO_OPEN_BROWSER` environment variable (default: `true`)
+  - Set to `false` to disable auto-open for headless or background deployments
+  - Gracefully handles errors if browser cannot be opened
+  - Uses the `open` package for cross-platform browser launching
+- **Line Ending Normalization**: Added `.gitattributes` file to enforce LF line endings for better cross-platform consistency
+  - Ensures all `.ts`, `.js`, `.json`, and `.md` files use LF line endings
+  - Improves collaboration between Windows, macOS, and Linux developers
+  - Aligns with existing `.editorconfig` settings
+
+### Changed
+- Updated `.env.example` with `AUTO_OPEN_BROWSER` configuration documentation
+- Enhanced `CONFIGURATION.md` with browser auto-open setting details
+- Updated `src/config.ts` to include `autoOpenBrowser` configuration property
+- Modified `src/webserver.ts` to implement browser auto-launch functionality
+- Updated `package.json` and `package-lock.json` with `open` dependency (v10.1.0)
+
+### Technical Details
+- Added new config property: `autoOpenBrowser: boolean` (default: `true`)
+- Server logs indicate when browser is being opened: `🌍 Opening browser...`
+- Warning logged if browser fails to open: `⚠ Could not auto-open browser: [error]`
+- Browser opens to server URL (e.g., `http://localhost:3000`)
+
+### Contributors
+- Feature implemented by [@M1XZG](https://github.com/M1XZG) - Thank you! 🎉
+- Pull Request: [#3](https://github.com/SweetSamanthaVR/VRCIM/pull/3)
+
 ## [1.3.1] - 2025-11-03
 
 ### Changed
@@ -244,6 +274,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This is the initial release of VRCIM. For future updates, changes will be documented following the categories: Added, Changed, Deprecated, Removed, Fixed, and Security.
 
+[1.4.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.2.0...v1.2.1
