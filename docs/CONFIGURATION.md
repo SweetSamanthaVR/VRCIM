@@ -308,6 +308,26 @@ XSOVERLAY_ENABLED=true
 
 **Note:** You can enable both. VRCIM will send to whichever is running.
 
+## Browser Configuration
+
+### AUTO_OPEN_BROWSER
+
+Controls whether the application automatically opens your default web browser when the server starts.
+
+- **Type**: Boolean (`true` or `false`)
+- **Default**: `true`
+- **Example**: `AUTO_OPEN_BROWSER=false`
+
+When enabled, the application will:
+- Open your default web browser automatically after the server starts
+- Navigate to the correct URL (`http://localhost:3000` by default)
+- Display a warning in the log if it cannot open the browser
+
+Set to `false` if you:
+- Prefer to manually open your browser
+- Run the server in a headless environment
+- Use a custom browser or workflow
+
 ## Configuration Examples
 
 ### Example 1: Default Local Setup
