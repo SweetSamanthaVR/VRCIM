@@ -7,6 +7,7 @@ import express from 'express';
 import { WebSocketServer, WebSocket } from 'ws';
 import { createServer, Server } from 'http';
 import * as path from 'path';
+import open from 'open';
 import config, { getWebSocketUrl } from './config';
 import { VRChatDatabase } from './database';
 import { VRChatAuthService } from './auth';
@@ -742,9 +743,19 @@ export class WebServer {
      */
     start(): void {
         this.server.listen(this.port, this.host, () => {
-            const protocol = config.nodeEnv === 'production' ? 'https' : 'http';
-            logger.info(`🌐 Web server running at ${protocol}://${this.host}:${this.port}`);
+            // Always use http unless explicitly configured for https
+            const protocol = 'http'; // Can be enhanced later to support https detection
+            const url = `${protocol}://${this.host}:${this.port}`;
+            logger.info(`🌐 Web server running at ${url}`);
             logger.info(`🔌 WebSocket server ready for connections`);
+            
+            // Auto-open browser if enabled
+            if (config.autoOpenBrowser) {
+                logger.info(`🌍 Opening browser...`);
+                open(url).catch(err => {
+                    logger.warn(`⚠ Could not auto-open browser: ${err.message}`);
+                });
+            }
         });
     }
 
