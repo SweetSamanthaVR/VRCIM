@@ -7,7 +7,6 @@ import express from 'express';
 import { WebSocketServer, WebSocket } from 'ws';
 import { createServer, Server } from 'http';
 import * as path from 'path';
-import open from 'open';
 import config, { getWebSocketUrl } from './config';
 import { VRChatDatabase } from './database';
 import { VRChatAuthService } from './auth';
@@ -23,6 +22,7 @@ import {
     validatePaginationQuery
 } from './validators';
 import { logger } from './logger';
+import { localizationService } from './localization';
 
 export class WebServer {
     private app: express.Application;
@@ -483,36 +483,66 @@ export class WebServer {
             }
         });
 
+        // Localization API endpoints
+        this.app.get('/api/languages', (req, res) => {
+            try {
+                const languages = localizationService.getAvailableLanguages();
+                res.json({ languages });
+            } catch (error) {
+                logger.error('Error fetching available languages:', error);
+                res.status(500).json({ error: 'Failed to fetch languages' });
+            }
+        });
+
+        this.app.get('/api/translations/:lang', (req, res) => {
+            try {
+                const langCode = req.params.lang;
+                const translations = localizationService.getTranslations(langCode);
+                res.json({ translations });
+            } catch (error) {
+                logger.error('Error fetching translations:', error);
+                res.status(500).json({ error: 'Failed to fetch translations' });
+            }
+        });
+
         // View routes - Render EJS templates
         this.app.get('/', (req, res) => {
+            const detectedLang = localizationService.detectLanguage(req.headers['accept-language'] as string);
             res.render('index', {
                 title: 'VRChat Instance Monitor',
                 pageCSS: 'monitor.css',
-                pageJS: 'monitor.js'
+                pageJS: 'monitor.js',
+                lang: detectedLang
             });
         });
 
         this.app.get('/login', (req, res) => {
+            const detectedLang = localizationService.detectLanguage(req.headers['accept-language'] as string);
             res.render('login', {
                 title: 'Login',
                 pageCSS: 'login.css',
-                pageJS: 'login.js'
+                pageJS: 'login.js',
+                lang: detectedLang
             });
         });
 
         this.app.get('/users', (req, res) => {
+            const detectedLang = localizationService.detectLanguage(req.headers['accept-language'] as string);
             res.render('users', {
                 title: 'Cached Users',
                 pageCSS: 'users.css',
-                pageJS: 'users.js'
+                pageJS: 'users.js',
+                lang: detectedLang
             });
         });
 
         this.app.get('/user-details', (req, res) => {
+            const detectedLang = localizationService.detectLanguage(req.headers['accept-language'] as string);
             res.render('user-details', {
                 title: 'User Profile',
                 pageCSS: 'user-details.css',
-                pageJS: 'user-details.js'
+                pageJS: 'user-details.js',
+                lang: detectedLang
             });
         });
     }
@@ -752,8 +782,12 @@ export class WebServer {
             // Auto-open browser if enabled
             if (config.autoOpenBrowser) {
                 logger.info(`🌍 Opening browser...`);
-                open(url).catch(err => {
-                    logger.warn(`⚠ Could not auto-open browser: ${err.message}`);
+                import('open').then(({ default: open }) => {
+                    open(url).catch(err => {
+                        logger.warn(`⚠ Could not auto-open browser: ${err.message}`);
+                    });
+                }).catch(err => {
+                    logger.warn(`⚠ Could not load open module: ${err.message}`);
                 });
             }
         });
