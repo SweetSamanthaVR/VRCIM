@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang || 'en' %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,49 +13,49 @@
     <main>
         <div class="container">
             <header class="page-header">
-                <h1>📋 Cached Users</h1>
-                <p>All VRChat users you've encountered</p>
+                <h1>📋 <span data-i18n="users.title">Cached Users</span></h1>
+                <p data-i18n="users.subtitle">All VRChat users you've encountered</p>
             </header>
 
             <div class="stats-summary">
                 <div class="stat-card">
-                    <div class="stat-label">Total Cached Users</div>
+                    <div class="stat-label" data-i18n="users.totalCachedUsers">Total Cached Users</div>
                     <div class="stat-value" id="totalUsers">0</div>
                 </div>
             </div>
 
             <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="🔍 Search by username or display name...">
+                <input type="text" id="searchInput" data-i18n-placeholder="users.searchPlaceholder" placeholder="🔍 Search by username or display name...">
             </div>
 
             <div class="filter-tabs">
-                <button class="filter-tab active" data-filter="all">All Users</button>
-                <button class="filter-tab" data-filter="visitor">Visitors</button>
-                <button class="filter-tab" data-filter="new-user">New Users</button>
-                <button class="filter-tab" data-filter="user">Users</button>
-                <button class="filter-tab" data-filter="known-user">Known Users</button>
-                <button class="filter-tab" data-filter="trusted-user">Trusted Users</button>
-                <button class="filter-tab" data-filter="veteran-user">Veteran Users</button>
-                <button class="filter-tab" data-filter="legendary-user">Legendary Users</button>
+                <button class="filter-tab active" data-filter="all" data-i18n="users.allUsers">All Users</button>
+                <button class="filter-tab" data-filter="visitor" data-i18n="users.visitors">Visitors</button>
+                <button class="filter-tab" data-filter="new-user" data-i18n="users.newUsers">New Users</button>
+                <button class="filter-tab" data-filter="user" data-i18n="users.users">Users</button>
+                <button class="filter-tab" data-filter="known-user" data-i18n="users.knownUsers">Known Users</button>
+                <button class="filter-tab" data-filter="trusted-user" data-i18n="users.trustedUsers">Trusted Users</button>
+                <button class="filter-tab" data-filter="veteran-user" data-i18n="users.veteranUsers">Veteran Users</button>
+                <button class="filter-tab" data-filter="legendary-user" data-i18n="users.legendaryUsers">Legendary Users</button>
             </div>
 
             <div id="content" class="content">
                 <!-- Loading State -->
-                <div id="loading-state" class="loading">Loading users...</div>
+                <div id="loading-state" class="loading" data-i18n="common.loading">Loading...</div>
                 
                 <!-- Error State -->
                 <div id="error-state" class="error" style="display: none;">
-                    <h2>Error Loading Users</h2>
+                    <h2 data-i18n="common.error">Error</h2>
                     <p id="error-message"></p>
                     <div style="margin-top: 20px;">
-                        <button id="retry-button" class="btn">Retry</button>
+                        <button id="retry-button" class="btn" data-i18n="common.refresh">Retry</button>
                     </div>
                 </div>
                 
                 <!-- No Results State -->
                 <div id="no-results-state" class="no-results" style="display: none;">
-                    <p>No users found.</p>
-                    <p style="margin-top: 10px; font-size: 14px;" id="no-results-hint"></p>
+                    <p data-i18n="users.noUsersFound">No users found.</p>
+                    <p style="margin-top: 10px; font-size: 14px;" id="no-results-hint" data-i18n="users.clearFilters">Clear filters to see all users</p>
                 </div>
                 
                 <!-- Users Grid (populated by JavaScript) -->
@@ -63,15 +63,16 @@
             </div>
 
             <div id="pagination" class="pagination" style="display: none;">
-                <button id="prevPage">← Previous</button>
+                <button id="prevPage" data-i18n="monitor.pagination.previous">← Previous</button>
                 <span id="pageInfo">Page 1 of 1</span>
-                <button id="nextPage">Next →</button>
+                <button id="nextPage" data-i18n="monitor.pagination.next">Next →</button>
             </div>
         </div>
     </main>
     
     <%- include('partials/footer') %>
     
+    <script src="/js/i18n.js"></script>
     <script src="/js/config.js"></script>
     <script src="/js/common.js"></script>
     <script src="/js/<%= pageJS %>"></script>

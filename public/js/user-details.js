@@ -133,7 +133,8 @@ function setupRefreshButton() {
 
     refreshBtn.addEventListener('click', async () => {
         refreshBtn.disabled = true;
-        refreshBtn.textContent = '⏳ Refreshing...';
+        refreshBtn.innerHTML = '⏳ <span data-i18n="userDetails.refreshing">Refreshing...</span>';
+        if (window.i18n && window.i18n.ready) window.i18n.applyTranslations();
         
         try {
             // Refresh the cache first
@@ -147,15 +148,16 @@ function setupRefreshButton() {
             
             // Then reload with live data
             await loadUserProfile(userId);
-            refreshBtn.textContent = '✅ Refreshed!';
+            refreshBtn.innerHTML = '✅ ' + (window.i18n && window.i18n.ready ? window.i18n.t('success.profileRefreshed') : 'Refreshed!');
             
             // Show success toast
             if (typeof showToast === 'function') {
-                showToast('User data refreshed successfully!', 'success');
+                showToast(window.i18n && window.i18n.ready ? window.i18n.t('success.profileRefreshed') : 'User data refreshed successfully!', 'success');
             }
             
             setTimeout(() => {
-                refreshBtn.textContent = '🔄 Refresh from API';
+                refreshBtn.innerHTML = '🔄 <span data-i18n="userDetails.refreshProfile">Refresh Profile</span>';
+                if (window.i18n && window.i18n.ready) window.i18n.applyTranslations();
                 refreshBtn.disabled = false;
             }, 2000);
         } catch (error) {
@@ -266,8 +268,8 @@ function displayUserProfile(user, encounters) {
         const encounterItems = encounters.map(encounter => `
             <div class="encounter-item">
                 <div class="encounter-info">
-                    <div class="encounter-world">${escapeHtml(encounter.worldName)}</div>
-                    <div class="encounter-timestamp">${formatTimestamp(encounter.timestamp)}</div>
+                    <div class="encounter-world" data-i18n-title="userDetails.worldName">${escapeHtml(encounter.worldName)}</div>
+                    <div class="encounter-timestamp" data-i18n-title="userDetails.timestamp">${formatTimestamp(encounter.timestamp)}</div>
                 </div>
                 <div class="encounter-type ${escapeHtml(encounter.eventType)}">${escapeHtml(encounter.eventType)}</div>
             </div>
@@ -303,7 +305,7 @@ function displayUserProfile(user, encounters) {
 
         ${user.bio ? `
             <div class="bio">
-                <strong style="color: #00d9ff;">Bio:</strong><br>
+                <strong style="color: #00d9ff;" data-i18n="userDetails.biography">Biography</strong>:<br>
                 ${escapeHtml(user.bio)}
                 ${bioLinksHtml}
             </div>
@@ -311,23 +313,23 @@ function displayUserProfile(user, encounters) {
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">User ID</div>
+                <div class="stat-label" data-i18n="userDetails.username">Username</div>
                 <div class="stat-value" style="font-size: 12px; word-break: break-all;">${escapeHtml(user.id)}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Times Encountered</div>
+                <div class="stat-label" data-i18n="users.timesEncountered">Times Encountered</div>
                 <div class="stat-value">${user.timesEncountered || 1}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">First Seen</div>
+                <div class="stat-label" data-i18n="users.firstSeen">First Seen</div>
                 <div class="stat-value" style="font-size: 14px;">${formatTimestamp(user.firstSeen)}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Last Updated</div>
+                <div class="stat-label" data-i18n="users.lastUpdated">Last Updated</div>
                 <div class="stat-value" style="font-size: 14px;">${formatTimestamp(user.lastUpdated)}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Activity Status</div>
+                <div class="stat-label" data-i18n="userDetails.accountStatus">Account Status</div>
                 <div class="stat-value" style="font-size: 16px; color: ${statusColor};">${escapeHtml(user.status || 'Unknown')}</div>
             </div>
             <div class="stat-card">
@@ -335,16 +337,16 @@ function displayUserProfile(user, encounters) {
                 <div class="stat-value" style="font-size: 14px;">${escapeHtml(user.state || 'Unknown')}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Last Login</div>
+                <div class="stat-label" data-i18n="userDetails.lastLogin">Last Login</div>
                 <div class="stat-value" style="font-size: 14px;">${user.lastLogin ? formatTimestamp(user.lastLogin) : 'Hidden'}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Last Platform</div>
+                <div class="stat-label" data-i18n="userDetails.lastPlatform">Last Platform</div>
                 <div class="stat-value" style="font-size: 14px;">${escapeHtml(user.lastPlatform || 'Unknown')}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Friend Status</div>
-                <div class="stat-value" style="font-size: 14px; color: ${user.isFriend ? '#00ff88' : '#aaa'};">${user.isFriend ? 'Friend' : 'Not Friend'}</div>
+                <div class="stat-value" style="font-size: 14px; color: ${user.isFriend ? '#00ff88' : '#aaa'};" data-i18n="${user.isFriend ? 'userDetails.friend' : 'userDetails.notFriend'}">${user.isFriend ? 'Friend' : 'Not Friend'}</div>
             </div>
         </div>
 
@@ -407,6 +409,11 @@ function displayUserProfile(user, encounters) {
         encountersSection.style.display = 'block';
     } else {
         encountersSection.style.display = 'none';
+    }
+    
+    // Apply translations to dynamically created content
+    if (window.i18n && window.i18n.ready) {
+        window.i18n.applyTranslations();
     }
 }
 

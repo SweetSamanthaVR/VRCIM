@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang || 'en' %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -79,6 +79,7 @@
     
     <%- include('partials/footer') %>
     
+    <script src="/js/i18n.js"></script>
     <script src="/js/config.js"></script>
     <script src="/js/common.js"></script>
     <script src="/js/<%= pageJS %>"></script>
