@@ -351,6 +351,11 @@ function renderVirtualItems() {
         ${usersHtml}
         <div class="virtual-spacer-bottom" style="height: ${Math.max(0, virtualScrollState.totalHeight - offsetTop - (visibleUsers.length * rowHeight / columnsPerRow))}px; grid-column: 1 / -1;"></div>
     `;
+    
+    // Apply translations to dynamically created content
+    if (window.i18n && window.i18n.ready) {
+        window.i18n.applyTranslations();
+    }
 }
 
 /**
@@ -422,6 +427,11 @@ function displayUsers(users) {
         const usersHtml = users.map(user => createUserCard(user)).join('');
         usersGrid.innerHTML = usersHtml;
     }
+    
+    // Apply translations to dynamically created content
+    if (window.i18n && window.i18n.ready) {
+        window.i18n.applyTranslations();
+    }
 }
 
 /**
@@ -447,11 +457,11 @@ function createUserCard(user) {
             <div class="user-card-stats">
                 <div class="user-card-stat">
                     <div class="user-card-stat-value">${encounters}</div>
-                    <div class="user-card-stat-label">Encounters</div>
+                    <div class="user-card-stat-label" data-i18n="users.timesEncountered">Times Encountered</div>
                 </div>
                 <div class="user-card-stat">
                     <div class="user-card-stat-value" style="font-size: 0.9em;">${firstSeen}</div>
-                    <div class="user-card-stat-label">First Seen</div>
+                    <div class="user-card-stat-label" data-i18n="users.firstSeen">First Seen</div>
                 </div>
             </div>
         </a>

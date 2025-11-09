@@ -3,6 +3,8 @@
  * Contains: Auth checking, utility functions, common UI interactions
  */
 
+console.log('common.js loading...');
+
 // ============================================
 // GLOBAL ERROR HANDLING
 // ============================================
@@ -395,9 +397,102 @@ function initCommon() {
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCommon);
+    document.addEventListener('DOMContentLoaded', () => {
+        initCommon();
+        initLanguageSelector();
+    });
 } else {
     initCommon();
+    initLanguageSelector();
+}
+
+// ============================================
+// LANGUAGE SELECTOR
+// ============================================
+
+/**
+ * Initialize the language selector dropdown
+ */
+async function initLanguageSelector() {
+    console.log('initLanguageSelector called');
+    const languageSelect = document.getElementById('language-select');
+    console.log('Language select element:', languageSelect);
+    if (!languageSelect) {
+        console.log('Language select element not found!');
+        return;
+    }
+
+    // Wait for i18n to be ready
+    if (!window.i18n || !window.i18n.ready) {
+        window.addEventListener('i18nReady', initLanguageSelector, { once: true });
+        return;
+    }
+
+    try {
+        // Get available languages from API
+        const languages = await window.i18n.getAvailableLanguages();
+        
+        console.log('Available languages:', languages);
+        
+        // Clear loading option
+        languageSelect.innerHTML = '';
+        
+        // Check if we have languages
+        if (!languages || languages.length === 0) {
+            throw new Error('No languages available');
+        }
+        
+        // Populate dropdown with available languages
+        languages.forEach(lang => {
+            const option = document.createElement('option');
+            option.value = lang.code;
+            option.textContent = lang.name;
+            languageSelect.appendChild(option);
+        });
+        
+        // Set current language as selected
+        languageSelect.value = window.i18n.currentLanguage || 'en';
+        
+        console.log('Language selector initialized with:', window.i18n.currentLanguage);
+        
+        // Handle language change
+        languageSelect.addEventListener('change', async (e) => {
+            const newLang = e.target.value;
+            if (newLang === window.i18n.currentLanguage) return;
+            
+            try {
+                await window.i18n.changeLanguage(newLang);
+                // Reload page to apply translations to all dynamically generated content
+                window.location.reload();
+            } catch (error) {
+                console.error('Failed to change language:', error);
+                displayErrorMessage('Failed to change language');
+            }
+        });
+        
+        // Listen for language changes from other sources
+        window.addEventListener('languageChanged', (e) => {
+            languageSelect.value = e.detail.language;
+        });
+    } catch (error) {
+        console.error('Failed to initialize language selector:', error);
+        // Fallback to basic options
+        languageSelect.innerHTML = '<option value="en">English</option><option value="de">Deutsch</option>';
+        languageSelect.value = window.i18n.currentLanguage || 'en';
+        
+        // Still handle language change even in fallback mode
+        languageSelect.addEventListener('change', async (e) => {
+            const newLang = e.target.value;
+            if (newLang === window.i18n.currentLanguage) return;
+            
+            try {
+                await window.i18n.changeLanguage(newLang);
+                window.location.reload();
+            } catch (error) {
+                console.error('Failed to change language:', error);
+            }
+        });
+    }
 }
 
 // Export functions for use in other scripts

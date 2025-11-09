@@ -39,6 +39,9 @@ export interface AppConfig {
     
     // Browser Configuration
     autoOpenBrowser: boolean;
+    
+    // Localization Configuration
+    defaultLanguage: string;
 }
 
 /**
@@ -101,6 +104,9 @@ function loadConfig(): AppConfig {
     // Browser Configuration
     const autoOpenBrowser = process.env.AUTO_OPEN_BROWSER !== 'false'; // Default: true
     
+    // Localization Configuration
+    const defaultLanguage = process.env.DEFAULT_LANGUAGE || 'en';
+    
     return {
         port,
         host,
@@ -115,7 +121,8 @@ function loadConfig(): AppConfig {
         playersPerPage,
         recentActivityLimit,
         cachedUsersPerPage,
-        autoOpenBrowser
+        autoOpenBrowser,
+        defaultLanguage
     };
 }
 
@@ -169,6 +176,7 @@ function displayConfig(config: AppConfig): void {
     logger.info(`   Recent Activity Limit: ${config.recentActivityLimit}`);
     logger.info(`   Cached Users Per Page: ${config.cachedUsersPerPage}`);
     logger.info(`   Auto-Open Browser: ${config.autoOpenBrowser ? 'Enabled' : 'Disabled'}`);
+    logger.info(`   Default Language: ${config.defaultLanguage}`);
 }
 
 // Load configuration once at module initialization

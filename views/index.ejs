@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang || 'en' %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,41 +14,41 @@
         <div class="container">
             <div class="stats-panel">
                 <div class="stat-card">
-                    <div class="stat-label">Current World</div>
+                    <div class="stat-label" data-i18n="monitor.currentWorld">Current World</div>
                     <div class="stat-value stat-value-small" id="current-world">—</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Players in World</div>
+                    <div class="stat-label" data-i18n="monitor.playersInWorld">Players in World</div>
                     <div class="stat-value" id="players-in-world">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">API Queue</div>
+                    <div class="stat-label" data-i18n="monitor.apiQueue">API Queue</div>
                     <div class="stat-value" id="api-queue">0</div>
-                    <div class="stat-label" style="margin-top: 5px; font-size: 10px;">1s per user</div>
+                    <div class="stat-label" style="margin-top: 5px; font-size: 10px;" data-i18n="monitor.perUser">1s per user</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Session Playtime</div>
+                    <div class="stat-label" data-i18n="monitor.sessionPlaytime">Session Playtime</div>
                     <div class="stat-value" id="session-playtime">0h 0m</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Current Session</div>
+                    <div class="stat-label" data-i18n="monitor.currentSession">Current Session</div>
                     <div class="stat-value" id="current-session">—</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Connection Status</div>
+                    <div class="stat-label" data-i18n="monitor.connectionStatus">Connection Status</div>
                     <div class="stat-value" style="display: flex; align-items: center; gap: 8px;">
                         <span id="status-indicator" class="status-dot offline"></span>
-                        <span id="status-text" style="font-size: 16px;">Disconnected</span>
+                        <span id="status-text" style="font-size: 16px;" data-i18n="monitor.disconnected">Disconnected</span>
                     </div>
                 </div>
             </div>
 
             <!-- Players in Instance Section -->
             <div class="section-header">
-                <h2>👥 Players in Instance</h2>
+                <h2><span data-i18n="monitor.playersInInstance">👥 Players in Instance</span></h2>
                 <button id="toggle-notifications-btn" class="notification-toggle-btn" title="Toggle VR notifications">
                     <span id="notification-icon">🔔</span>
-                    <span id="notification-text">Notifications On</span>
+                    <span id="notification-text" data-i18n="monitor.notificationsOn">Notifications On</span>
                 </button>
             </div>
 
@@ -56,28 +56,28 @@
                 <div id="players-grid-container" class="players-grid-container">
                     <div id="players-grid" class="players-grid"></div>
                     <div id="no-vrchat-message" class="no-vrchat-message" style="display: none;">
-                        ⚠️ VRChat is not currently running
+                        ⚠️ <span data-i18n="monitor.vrchatNotRunning">VRChat is not currently running</span>
                     </div>
                 </div>
 
                 <div class="pagination players-pagination">
-                    <button id="players-prev-page" disabled>← Previous</button>
+                    <button id="players-prev-page" disabled data-i18n="monitor.pagination.previous">← Previous</button>
                     <span id="players-page-info">Page 1</span>
-                    <button id="players-next-page" disabled>Next →</button>
+                    <button id="players-next-page" disabled data-i18n="monitor.pagination.next">Next →</button>
                 </div>
             </div>
 
             <!-- Recent Activity Section -->
             <div class="section-header">
-                <h2>📋 Recent Activity</h2>
+                <h2>📋 <span data-i18n="monitor.recentActivity">Recent Activity</span></h2>
             </div>
 
             <div class="filters">
                 <label>
-                    <input type="checkbox" id="filter-world" checked> World Events
+                    <input type="checkbox" id="filter-world" checked> <span data-i18n="monitor.worldEvents">World Events</span>
                 </label>
                 <label>
-                    <input type="checkbox" id="filter-player" checked> Player Events
+                    <input type="checkbox" id="filter-player" checked> <span data-i18n="monitor.playerEvents">Player Events</span>
                 </label>
             </div>
 
@@ -89,14 +89,14 @@
                 <!-- Empty State Template (hidden by default, shown when no logs) -->
                 <div id="empty-state-template" class="empty-state" style="display: none;">
                     <div class="empty-state-icon">📭</div>
-                    <div class="empty-state-text">No logs available</div>
+                    <div class="empty-state-text" data-i18n="monitor.noLogsAvailable">No logs available</div>
                 </div>
             </div>
 
             <div class="pagination">
-                <button id="prev-page" disabled>← Previous</button>
+                <button id="prev-page" disabled data-i18n="monitor.pagination.previous">← Previous</button>
                 <span id="page-info">Page 1</span>
-                <button id="next-page" disabled>Next →</button>
+                <button id="next-page" disabled data-i18n="monitor.pagination.next">Next →</button>
             </div>
         </div>
     </main>
@@ -121,6 +121,7 @@
         </div>
     </template>
     
+    <script src="/js/i18n.js"></script>
     <script src="/js/config.js"></script>
     <script src="/js/common.js"></script>
     <script src="/js/<%= pageJS %>"></script>
