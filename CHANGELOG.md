@@ -5,6 +5,62 @@ All notable changes to VRCIM (VRChat Instance Monitor) will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-11-09
+
+### Added
+- **Complete Internationalization System**: Full localization support with automatic language detection
+  - Browser language auto-detection from HTTP Accept-Language header
+  - Client-side i18n library (`public/js/i18n.js`) with dynamic translation loading
+  - Support for variable interpolation in translations (e.g., `{{username}}`)
+  - Language preference persistence via localStorage
+  - Configurable default language via `DEFAULT_LANGUAGE` environment variable
+  - Graceful fallback to English if requested language unavailable
+  
+- **Built-in Language Support**:
+  - 🇬🇧 English (en) - Default language with 150+ translation keys
+  - 🇩🇪 German (de) - Complete translation
+  - 🇫🇷 French (fr) - Complete translation
+  
+- **Developer-Friendly Translation System**:
+  - Simple `data-i18n` attribute for HTML element translation
+  - Support for placeholder (`data-i18n-placeholder`) and title (`data-i18n-title`) attributes
+  - JavaScript API via `window.i18n.t()` for dynamic translations
+  - Runtime language switching with `window.i18n.changeLanguage()`
+  
+- **Backend Localization Service** (`src/localization.ts`):
+  - Loads translation files from `languages/` directory at startup
+  - Auto-generates default English translations if no files exist
+  - REST API endpoints for language data:
+    - `GET /api/languages` - Returns available languages
+    - `GET /api/translations/:lang` - Returns translations for specific language
+  
+- **Comprehensive Documentation**:
+  - Complete localization guide in `docs/LOCALIZATION.md`
+  - Translation contributor guide in `languages/README.md`
+  - Developer usage examples for HTML and JavaScript
+  - Step-by-step guide for adding new languages
+
+### Changed
+- Updated all EJS view templates with proper `lang` attribute
+- Enhanced header navigation with i18n script inclusion
+- Modified webserver to integrate localization service
+- Updated configuration system to support `DEFAULT_LANGUAGE` setting
+- Added language detection middleware to webserver routes
+- Updated `.env.example` with localization configuration section
+
+### Technical Details
+- New files: `src/localization.ts`, `public/js/i18n.js`, 3 language JSON files
+- Translation structure: Nested JSON with dot notation (e.g., `monitor.title`)
+- All view templates updated for i18n compatibility
+- Auto-detection order: localStorage → browser preference → default language
+- Backend: 327 lines of localization service code
+- Frontend: 168 lines of i18n client library
+- Total translations per language: 150+ keys across 10 categories
+
+### Contributors
+- Internationalization system implemented by [@M1XZG](https://github.com/M1XZG) - Amazing work! 🎉
+- Pull Request: [#5](https://github.com/SweetSamanthaVR/VRCIM/pull/5)
+
 ## [1.4.2] - 2025-11-04
 
 ### Changed
@@ -305,6 +361,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Note**: This is the initial release of VRCIM. For future updates, changes will be documented following the categories: Added, Changed, Deprecated, Removed, Fixed, and Security.
 
+[1.5.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.4.2...v1.5.0
 [1.4.2]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/SweetSamanthaVR/VRCIM/compare/v1.3.1...v1.4.0
